@@ -29,6 +29,9 @@ public interface PostClient {
             String INTEGER = "Integer";
             String DOUBLE = "Double";
             String LONG = "Long";
+            String MANY_TO_ONE = "ManyToOne";
+            String ONE_TO_ONE = "OneToOne";
+            String ONE_TO_MANY = "OneToMany";
         }
 
         String AT_BRPL = "atBrpl";

@@ -54,16 +54,13 @@ public class BoatSyncronizer implements PostClient {
 
     @Async
     public void executingTaskBoatToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
-        int delay = (int) mappingSetting.get("delayInSecond");
+        int delay = (int) mappingSetting.get("delayInMilisecond");
         int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
 
         executor.execute(() -> {
             try {
                 while (true) {
                     logger.info("BOAT");
-//                    if (sleep.length > 0)
-//                        TimeUnit.SECONDS.sleep(sleep[0]);
-//                    else
                     TimeUnit.MILLISECONDS.sleep(delay);
 
                     List<TNCBoat> data = getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
@@ -86,7 +83,6 @@ public class BoatSyncronizer implements PostClient {
 
     private synchronized void processingTask(List<TNCBoat> tncboats, LinkedHashMap mappingSetting, int numberOfDataPerRequest) {
 
-//        long boatSize = tncboats.size();
         String host = String.valueOf(mappingSetting.get("host"));
         String tempPort = String.valueOf(mappingSetting.get("port"));
         String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
@@ -145,7 +141,6 @@ public class BoatSyncronizer implements PostClient {
 
         });
 
-//        return true;
     }
 
 }

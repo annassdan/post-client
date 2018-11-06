@@ -51,7 +51,7 @@ public class SpeciesSyncronizer implements PostClient {
 
     @Async
     public void executingTaskSpeciesToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
-        int delay = (int) mappingSetting.get("delayInSecond");
+        int delay = (int) mappingSetting.get("delayInMilisecond");
         int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
 
         executor.execute(() -> {
@@ -59,17 +59,21 @@ public class SpeciesSyncronizer implements PostClient {
                 while (true) {
                     i = 0;
                     logger.info("SPECIES");
-                    if (sleep.length > 0)
-                        TimeUnit.SECONDS.sleep(sleep[0]);
-                    else
-                        TimeUnit.SECONDS.sleep(delay);
+                    TimeUnit.MILLISECONDS.sleep(delay);
 
-                    long size = processingTask(mappingSetting, numberOfDataPerRequest);
-                    p = (size == 0) ? 0 : (p + 1);
-//                    p++;
+                    List<TNCSpecies> data = getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
+                    if (data.size() == 0) {
+                        if (tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name()) > 0)
+                            p = 0;
+                        else
+                            continue;
+                    } else {
+                        processingTask(data, mappingSetting, numberOfDataPerRequest);
+                        p = (data.size() < numberOfDataPerRequest) ? 0 : (p + 1);
+                    }
                 }
             } catch (Exception ignored) {
-                ignored.printStackTrace();
+                p = 0;
             }
         });
     }
@@ -81,9 +85,8 @@ public class SpeciesSyncronizer implements PostClient {
      * @param numberOfDataPerRequest
      * @return
      */
-    private synchronized long processingTask(LinkedHashMap mappingSetting, int numberOfDataPerRequest) {
-        List<TNCSpecies> tncSpecies = getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
-        long speciesSize = tncSpecies.size();
+    private synchronized void processingTask(List<TNCSpecies> tncSpecies, LinkedHashMap mappingSetting, int numberOfDataPerRequest) {
+
         String host = String.valueOf(mappingSetting.get("host"));
         String tempPort = String.valueOf(mappingSetting.get("port"));
         String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
@@ -129,8 +132,8 @@ public class SpeciesSyncronizer implements PostClient {
 
                             }
 
-                            String c = "Proses Data Ke-" + String.valueOf(i);
-                            logger.info(response.toString());
+                            String c = "Untuk Page " + String.valueOf(p + 1) + " ## data Ke-" + String.valueOf(i);
+                            logger.info(c);
 
                         } else {
 
@@ -142,7 +145,7 @@ public class SpeciesSyncronizer implements PostClient {
 
         });
 
-        return speciesSize;
+//        return true;
     }
 
 }

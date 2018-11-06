@@ -49,7 +49,7 @@ public class TNCSizing implements PostClient {
     private Integer dataQuality;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_PATTERN)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_PATTERN_MINIMAL)
     @JsonSerialize(using = CustomDateTimeSerializer.class)
     @Column(name = "codrs_picture_date")
     private Date codrsPictureDate;

@@ -1,5 +1,6 @@
 package com.project.ifish.postclient.models.atbrpl;
 
+import com.project.ifish.postclient.utils.ObjectManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,13 +17,13 @@ import java.util.Date;
 public class BRPLSizing {
 
     private String uuid;
-    private Date dibuatPadaTanggal;
-    private Date terakhirDiubahPadaTanggal;
+    private String dibuatPadaTanggal; // date
+    private String terakhirDiubahPadaTanggal; // date
     private String dibuatAtauTerakhirDiubahOleh;
 
-    private BRPLSpecies dataSpecies;
+    private ObjectManyToOne dataSpecies; // BRPLSpecies
     private Double cm;
-    private Date codrsPictureDate;
+    private String codrsPictureDate; // date
     private String codrsPictureName;
     private String lengthType;
 
