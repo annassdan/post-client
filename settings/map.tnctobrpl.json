@@ -1,8 +1,8 @@
 [
   {
     "className": "TNCSpecies",
-    "numberOfDataPerRequest": 1000,
-    "delayInSecond": 1,
+    "numberOfDataPerRequest": 100,
+    "delayInMilisecond": 1000,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -176,8 +176,8 @@
   },
   {
     "className": "TNCBoat",
-    "numberOfDataPerRequest": 1000,
-    "delayInSecond": 500,
+    "numberOfDataPerRequest": 100,
+    "delayInMilisecond": 500,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -507,9 +507,168 @@
   },
   {
     "className": "TNCDeepslope",
-    "numberOfDataPerRequest": 1000,
-    "delayInSecond": 10,
-    "mapOfColumns": [],
+    "numberOfDataPerRequest": 100,
+    "delayInMilisecond": 1000,
+    "mapOfColumns": [
+      {
+        "atTncType": "Long",
+        "atTnc": "oid",
+        "atBrplType": "String",
+        "atBrpl": "uuid"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "Date",
+        "atBrpl": "dibuatPadaTanggal"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "Date",
+        "atBrpl": "terakhirDiubahPadaTanggal"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "String",
+        "atBrpl": "dibuatAtauTerakhirDiubahOleh"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "approach",
+        "atBrplType": "Integer",
+        "atBrpl": "approach"
+      },
+      {
+        "atTncType": "Date",
+        "atTnc": "landingDate",
+        "atBrplType": "Date",
+        "atBrpl": "landingDate"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "landingLocation",
+        "atBrplType": "String",
+        "atBrpl": "landingLocation"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "wpp1",
+        "atBrplType": "String",
+        "atBrpl": "wpp1"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "wpp2",
+        "atBrplType": "String",
+        "atBrpl": "wpp2"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "wpp3",
+        "atBrplType": "String",
+        "atBrpl": "wpp3"
+      },
+      {
+        "classRef": "TNCBoat",
+        "atTncType": "Long",
+        "atTnc": "boatId",
+        "atBrplType": "ManyToOne",
+        "atBrpl": "dataBoat"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishingGear",
+        "atBrplType": "String",
+        "atBrpl": "fishingGear"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "broughtBy",
+        "atBrplType": "String",
+        "atBrpl": "broughtBy"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "otherFishingGround",
+        "atBrplType": "String",
+        "atBrpl": "otherFishingGround"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "supplier",
+        "atBrplType": "String",
+        "atBrpl": "supplier"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fisheryType",
+        "atBrplType": "String",
+        "atBrpl": "fisheryType"
+      },
+      {
+        "atTncType": "Date",
+        "atTnc": "entryDate",
+        "atBrplType": "Date",
+        "atBrpl": "entryDate"
+      },
+      {
+        "atTncType": "Date",
+        "atTnc": "postingDate",
+        "atBrplType": "Date",
+        "atBrpl": "postingDate"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "postingUser",
+        "atBrplType": "Long",
+        "atBrpl": "postingUser"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "docStatus",
+        "atBrplType": "String",
+        "atBrpl": "docStatus"
+      },
+      {
+        "atTncType": "Date",
+        "atTnc": "firstCodrsPictureDate",
+        "atBrplType": "Date",
+        "atBrpl": "firstCodrsPictureDate"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "dataStatus",
+        "atBrplType": "String",
+        "atBrpl": "dataStatuse"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "notes",
+        "atBrplType": "String",
+        "atBrpl": "notes"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "fishingLedger",
+        "atBrplType": "Long",
+        "atBrpl": "fishingLedger"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "totalCatch",
+        "atBrplType": "Integer",
+        "atBrpl": "totalCatch"
+      },
+      {
+        "classRef": "TNCSizing",
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "OneToMany",
+        "atBrpl": "dataSizing"
+      }
+    ],
     "host": "http://localhost",
     "port": "4002",
     "api": {
@@ -520,13 +679,69 @@
   {
     "className": "TNCSizing",
     "numberOfDataPerRequest": 1000,
-    "delayInSecond": 10,
-    "mapOfColumns": [],
+    "delayInMilisecond": 1000,
+    "mapOfColumns": [
+      {
+        "atTncType": "Long",
+        "atTnc": "oid",
+        "atBrplType": "String",
+        "atBrpl": "uuid"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "Date",
+        "atBrpl": "dibuatPadaTanggal"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "Date",
+        "atBrpl": "terakhirDiubahPadaTanggal"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "String",
+        "atBrpl": "dibuatAtauTerakhirDiubahOleh"
+      },
+      {
+        "classRef": "TNCSpecies",
+        "atTncType": "Long",
+        "atTnc": "fishId",
+        "atBrplType": "ManyToOne",
+        "atBrpl": "dataSpecies"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "cm",
+        "atBrplType": "Double",
+        "atBrpl": "cm"
+      },
+      {
+        "atTncType": "Timestamp",
+        "atTnc": "codrsPictureDate",
+        "atBrplType": "Timestamp",
+        "atBrpl": "codrsPictureDate"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "codrsPictureName",
+        "atBrplType": "String",
+        "atBrpl": "codrsPictureName"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "lengthType",
+        "atBrplType": "String",
+        "atBrpl": "lengthType"
+      }
+    ],
     "host": "http://localhost",
     "port": "4002",
     "api": {
-      "save": "",
-      "update": ""
+      "save": "/api/integrasi/sizing/",
+      "update": "/api/integrasi/sizing/"
     }
   }
 ]
