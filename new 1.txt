@@ -1,0 +1,33 @@
+Boat
+	- joinedColumnManyToOne in BRPL
+	- OneToMany	in BRPL
+	- joinedColumnOneToMany	
+	- excluded column to BRPL
+	- different column to BRPL	
+		1. oid = uuid
+
+
+
+// column di class
+Deepslope
+	- joinedColumnManyToOne in BRPL
+		1. boatId = dataBoat
+	- OneToMany	in BRPL
+		2. dataSizing (Data Size)
+	- joinedColumnOneToMany	
+	- excluded column from TNC
+		1. userId
+		2. partnerId
+	- different column to BRPL	
+		1. oid = uuid
+		
+//
+Sizing 
+	- joinedColumnManyToOne in BRPL
+		1. fishId = dataSpecies
+	- OneToMany	in BRPL
+	- joinedColumnOneToMany	
+	- excluded column to BRPL
+	- different column to BRPL	
+		1. oid = uuid
+		

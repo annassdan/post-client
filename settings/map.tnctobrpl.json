@@ -1,0 +1,532 @@
+[
+  {
+    "className": "TNCSpecies",
+    "numberOfDataPerRequest": 1000,
+    "delayInSecond": 1,
+    "mapOfColumns": [
+      {
+        "atTncType": "Long",
+        "atTnc": "oid",
+        "atBrplType": "String",
+        "atBrpl": "uuid"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "Date",
+        "atBrpl": "dibuatPadaTanggal"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "Date",
+        "atBrpl": "terakhirDiubahPadaTanggal"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "String",
+        "atBrpl": "dibuatAtauTerakhirDiubahOleh"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "isFamilyId",
+        "atBrplType": "Boolean",
+        "atBrpl": "family"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishPhylum",
+        "atBrplType": "String",
+        "atBrpl": "fishPhylum"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishClass",
+        "atBrplType": "String",
+        "atBrpl": "fishClass"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishOrder",
+        "atBrplType": "String",
+        "atBrpl": "fishOrder"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishFamily",
+        "atBrplType": "String",
+        "atBrpl": "fishFamily"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishGenus",
+        "atBrplType": "String",
+        "atBrpl": "fishGenus"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishSpecies",
+        "atBrplType": "String",
+        "atBrpl": "fishSpecies"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "commonNames",
+        "atBrplType": "String",
+        "atBrpl": "namaUmum"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "commonNames",
+        "atBrplType": "String",
+        "atBrpl": "namaIndonesia"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "hawaiianName",
+        "atBrplType": "String",
+        "atBrpl": "namaLatin"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "lmat",
+        "atBrplType": "Integer",
+        "atBrpl": "lmat"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "lopt",
+        "atBrplType": "Integer",
+        "atBrpl": "lopt"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "linf",
+        "atBrplType": "Integer",
+        "atBrpl": "linf"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "lmax",
+        "atBrplType": "Integer",
+        "atBrpl": "lmax"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "lmatm",
+        "atBrplType": "Integer",
+        "atBrpl": "lmatm"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "speciesIdNumber",
+        "atBrplType": "Integer",
+        "atBrpl": "speciesIdNumber"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "reportedTradeLimitWeight",
+        "atBrplType": "Double",
+        "atBrpl": "reportedTradeLimitWeight"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "varA",
+        "atBrplType": "Double",
+        "atBrpl": "varA"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "varB",
+        "atBrplType": "Double",
+        "atBrpl": "varB"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "lengthBasis",
+        "atBrplType": "String",
+        "atBrpl": "lengthBasis"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "convertedTradeLimitL",
+        "atBrplType": "Double",
+        "atBrpl": "convertedTradeLimitL"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "plottedTradeLimitTl",
+        "atBrplType": "Double",
+        "atBrpl": "plottedTradeLimitTl"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "conversionFactorTl2fl",
+        "atBrplType": "Double",
+        "atBrpl": "conversionFactorTl2fl"
+      }
+    ],
+    "host": "http://localhost",
+    "port": "4002",
+    "api": {
+      "save": "/api/master/spesies/",
+      "update": "/api/master/spesies/"
+    }
+  },
+  {
+    "className": "TNCBoat",
+    "numberOfDataPerRequest": 1000,
+    "delayInSecond": 500,
+    "mapOfColumns": [
+      {
+        "atTncType": "Long",
+        "atTnc": "oid",
+        "atBrplType": "String",
+        "atBrpl": "uuid"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "Date",
+        "atBrpl": "dibuatPadaTanggal"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "Date",
+        "atBrpl": "terakhirDiubahPadaTanggal"
+      },
+      {
+        "atTncType": null,
+        "atTnc": null,
+        "atBrplType": "String",
+        "atBrpl": "dibuatAtauTerakhirDiubahOleh"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "programSite",
+        "atBrplType": "String",
+        "atBrpl": "programSite"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "programType",
+        "atBrplType": "String",
+        "atBrpl": "programType"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "pictureOriginal",
+        "atBrplType": "Long",
+        "atBrpl": "pictureOriginal"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "pictureCensored",
+        "atBrplType": "Long",
+        "atBrpl": "pictureCensored"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "boatCode",
+        "atBrplType": "String",
+        "atBrpl": "boatCode"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "boatName",
+        "atBrplType": "String",
+        "atBrpl": "boatName"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishingGear",
+        "atBrplType": "String",
+        "atBrpl": "fishingGear"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "codrsContract",
+        "atBrplType": "String",
+        "atBrpl": "codrsContract"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "captain",
+        "atBrplType": "String",
+        "atBrpl": "captain"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "captainOrigin",
+        "atBrplType": "String",
+        "atBrpl": "captainOrigin"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "owner",
+        "atBrplType": "String",
+        "atBrpl": "owner"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "ownerOrigin",
+        "atBrplType": "String",
+        "atBrpl": "ownerOrigin"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "ownerDistrict",
+        "atBrplType": "String",
+        "atBrpl": "ownerDistrict"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "ownerProvince",
+        "atBrplType": "String",
+        "atBrpl": "ownerProvince"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "registrationPort",
+        "atBrplType": "String",
+        "atBrpl": "registrationPort"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "yearBuilt",
+        "atBrplType": "Integer",
+        "atBrpl": "yearBuilt"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "lengthOfBoat",
+        "atBrplType": "Double",
+        "atBrpl": "lengthOfBoat"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "widthOfBoat",
+        "atBrplType": "Double",
+        "atBrpl": "widthOfBoat"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "heightOfBoat",
+        "atBrplType": "Double",
+        "atBrpl": "heightOfBoat"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "capacityPalkaM3",
+        "atBrplType": "Double",
+        "atBrpl": "capacityPalkaM3"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "gtEstimate",
+        "atBrplType": "Double",
+        "atBrpl": "gtEstimate"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "gtDeclared",
+        "atBrplType": "Double",
+        "atBrpl": "gtDeclared"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "sizeCategory",
+        "atBrplType": "String",
+        "atBrpl": "sizeCategory"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "engineSpec",
+        "atBrplType": "String",
+        "atBrpl": "engineSpec"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "numberOfEngine",
+        "atBrplType": "Integer",
+        "atBrpl": "numberOfEngine"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "numberOfCrew",
+        "atBrplType": "Integer",
+        "atBrpl": "numberOfCrew"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "wppPermit1",
+        "atBrplType": "String",
+        "atBrpl": "wppPermit1"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "wppPermit2",
+        "atBrplType": "String",
+        "atBrpl": "wppPermit2"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "wppPermit3",
+        "atBrplType": "String",
+        "atBrpl": "wppPermit3"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "landingPort1",
+        "atBrplType": "String",
+        "atBrpl": "landingPort1"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "landingPort2",
+        "atBrplType": "String",
+        "atBrpl": "landingPort2"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "transDestination1",
+        "atBrplType": "String",
+        "atBrpl": "transDestination1"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "transDestination2",
+        "atBrplType": "String",
+        "atBrpl": "transDestination2"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "company1",
+        "atBrplType": "String",
+        "atBrpl": "company1"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "company2",
+        "atBrplType": "String",
+        "atBrpl": "company2"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "company3",
+        "atBrplType": "String",
+        "atBrpl": "company3"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishingArea1",
+        "atBrplType": "String",
+        "atBrpl": "fishingArea1"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishingArea2",
+        "atBrplType": "String",
+        "atBrpl": "fishingArea2"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishingArea3",
+        "atBrplType": "String",
+        "atBrpl": "fishingArea3"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "avgTripPerYear",
+        "atBrplType": "Integer",
+        "atBrpl": "avgTripPerYear"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "avgCatchPerTripKg",
+        "atBrplType": "Double",
+        "atBrpl": "avgCatchPerTripKg"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "avgCatchPerYearKg",
+        "atBrplType": "Double",
+        "atBrpl": "avgCatchPerYearKg"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "uuid",
+        "atBrplType": "String",
+        "atBrpl": "uuidData"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "counter",
+        "atBrplType": "Integer",
+        "atBrpl": "counter"
+      },
+      {
+        "atTncType": "Timestamp",
+        "atTnc": "codrsStartDate",
+        "atBrplType": "Timestamp",
+        "atBrpl": "codrsStartDate"
+      },
+      {
+        "atTncType": "Timestamp",
+        "atTnc": "codrsEndDate",
+        "atBrplType": "Timestamp",
+        "atBrpl": "codrsEndDate"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "engineHp1",
+        "atBrplType": "Integer",
+        "atBrpl": "engineHp1"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "engineHp2",
+        "atBrplType": "Integer",
+        "atBrpl": "engineHp2"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "engineHp3",
+        "atBrplType": "Integer",
+        "atBrpl": "engineHp3"
+      }
+    ],
+    "host": "http://localhost",
+    "port": "4002",
+    "api": {
+      "save": "/api/integrasi/boat/",
+      "update": "/api/integrasi/boat/"
+    }
+  },
+  {
+    "className": "TNCDeepslope",
+    "numberOfDataPerRequest": 1000,
+    "delayInSecond": 10,
+    "mapOfColumns": [],
+    "host": "http://localhost",
+    "port": "4002",
+    "api": {
+      "save": "",
+      "update": ""
+    }
+  },
+  {
+    "className": "TNCSizing",
+    "numberOfDataPerRequest": 1000,
+    "delayInSecond": 10,
+    "mapOfColumns": [],
+    "host": "http://localhost",
+    "port": "4002",
+    "api": {
+      "save": "",
+      "update": ""
+    }
+  }
+]
