@@ -3,6 +3,7 @@ package com.project.ifish.postclient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ifish.postclient.syncronizers.BoatSyncronizer;
+import com.project.ifish.postclient.syncronizers.DeepslopeSyncronizer;
 import com.project.ifish.postclient.syncronizers.SpeciesSyncronizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -25,8 +25,13 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
+    public static List<LinkedHashMap> appConfig;
+
     @Autowired
     private SpeciesSyncronizer speciesSyncronizer;
+
+    @Autowired
+    private DeepslopeSyncronizer deepslopeSyncronizer;
 
     @Autowired
     @SuppressWarnings("unused")
@@ -60,7 +65,7 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
     }
 
 
-    private static LinkedHashMap getSyncronizingSetting(List<LinkedHashMap> settings, @SuppressWarnings("unchecked") String cn) {
+    public static LinkedHashMap getSyncronizingSetting(List<LinkedHashMap> settings, @SuppressWarnings("unchecked") String cn) {
         for (LinkedHashMap setting : settings) {
             if (setting.get("className").equals(cn))
                 return setting;
@@ -72,17 +77,17 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
     @Override
     public void run(String... args) throws Exception {
 
-		RestTemplate restTemplate = new RestTemplate();
-		String url = "http://localhost:4002/api/sampling/operasional/?page=0&size=100";
-
-//		ResponseEntity responseEntity;
-
-
-
-
-//		responseEntity.getB
-
-		Object response = restTemplate.getForObject(url, Object.class);
+//		RestTemplate restTemplate = new RestTemplate();
+//		String url = "http://localhost:4002/api/sampling/operasional/?page=0&size=100";
+//
+////		ResponseEntity responseEntity;
+//
+//
+//
+//
+////		responseEntity.getB
+//
+//		Object response = restTemplate.getForObject(url, Object.class);
 //        speciesSyncronizer.executingTaskSpeciesToEBrpl(100);
 
 
@@ -113,13 +118,19 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
 //        logger.info(map1);
 
         List<LinkedHashMap> settings = initMapColumns();
+        appConfig = settings;
 //        LinkedHashMap speciesSetting = getSyncronizingSetting(settings, TNC_SPECIES_CLASS_NAME);
 //        if (speciesSetting == null) throw new AssertionError();
 //        speciesSyncronizer.executingTaskSpeciesToEBrpl(speciesSetting);
 
-        LinkedHashMap boatSetting = getSyncronizingSetting(settings, TNC_BOAT_CLASS_NAME);
-        if (boatSetting == null) throw new AssertionError();
-        boatSyncronizer.executingTaskBoatToEBrpl(boatSetting);
+//        LinkedHashMap boatSetting = getSyncronizingSetting(settings, TNC_BOAT_CLASS_NAME);
+//        if (boatSetting == null) throw new AssertionError();
+//        boatSyncronizer.executingTaskBoatToEBrpl(boatSetting);
+
+
+        LinkedHashMap deepslopeSetting = getSyncronizingSetting(settings, TNC_DEEPSLOPE_CLASS_NAME);
+        if (deepslopeSetting == null) throw new AssertionError();
+        deepslopeSyncronizer.executingTaskDeepslopeToEBrpl(deepslopeSetting);
 
 
 //        final ObjectMapper mapper1 = new ObjectMapper();

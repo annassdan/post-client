@@ -2,7 +2,7 @@
   {
     "className": "TNCSpecies",
     "numberOfDataPerRequest": 100,
-    "delayInMilisecond": 1000,
+    "delayInMilisecond": 250,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -508,7 +508,7 @@
   {
     "className": "TNCDeepslope",
     "numberOfDataPerRequest": 100,
-    "delayInMilisecond": 1000,
+    "delayInMilisecond": 500,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -641,7 +641,7 @@
         "atTncType": "String",
         "atTnc": "dataStatus",
         "atBrplType": "String",
-        "atBrpl": "dataStatuse"
+        "atBrpl": "dataStatus"
       },
       {
         "atTncType": "String",
@@ -663,8 +663,8 @@
       },
       {
         "classRef": "TNCSizing",
-        "atTncType": null,
-        "atTnc": null,
+        "atTncType": "Long",
+        "atTnc": "TNCSizing",
         "atBrplType": "OneToMany",
         "atBrpl": "dataSizing"
       }
@@ -672,14 +672,14 @@
     "host": "http://localhost",
     "port": "4002",
     "api": {
-      "save": "",
-      "update": ""
+      "save": "/api/integrasi/deepslope/",
+      "update": "/api/integrasi/deepslope/"
     }
   },
   {
     "className": "TNCSizing",
-    "numberOfDataPerRequest": 1000,
-    "delayInMilisecond": 1000,
+    "numberOfDataPerRequest": 100,
+    "delayInMilisecond": 250,
     "mapOfColumns": [
       {
         "atTncType": "Long",

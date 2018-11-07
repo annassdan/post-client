@@ -10,12 +10,12 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface TNCSizingRepo
         extends PagingAndSortingRepository<TNCSizing, Long>, JpaSpecificationExecutor<TNCSizing> {
 
+    Page<TNCSizing> findAllByLandingIdAndPostStatus(Pageable pageable, Long landingId, String postStatus);
+
+    long countByLandingIdAndPostStatus(Long landingId, String postStatus);
+
     Page<TNCSizing> findAllByPostStatus(Pageable pageable, String postStatus);
 
     long countByPostStatus(String postStatus);
-
-    long countByLandingId(Long landingId);
-
-    Page<TNCSizing> findAllByLandingId(Pageable pageable, Long landingId);
 
 }

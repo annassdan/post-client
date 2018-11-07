@@ -1,8 +1,6 @@
 package com.project.ifish.postclient.syncronizers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.ifish.postclient.PostClient;
 import com.project.ifish.postclient.models.atbrpl.BRPLSpecies;
 import com.project.ifish.postclient.models.attnc.TNCSpecies;
@@ -15,21 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @SuppressWarnings("unused")
+
 public class SpeciesSyncronizer implements PostClient {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     @Autowired
-    TNCSpeciesService tncSpeciesService;
+    private TNCSpeciesService tncSpeciesService;
 
     @Autowired
     private TaskExecutor executor;
@@ -37,38 +34,40 @@ public class SpeciesSyncronizer implements PostClient {
     @Autowired
     private PostClientTranslator translator;
 
-    int i = 0;
-    int p = 0;
+    private int i = 0;
+    private int p;
+    private String saveUrl;
 
-    public List<TNCSpecies> getAllData(int page, int size) {
-        return tncSpeciesService.getAll(page, size);
+    public SpeciesSyncronizer() {
+        this.p = 0;
     }
-
-    public List<TNCSpecies> getAllByPostStatus(String status, int page, int size) {
-        return tncSpeciesService.getAllByPostStatus(status, page, size);
-    }
-
 
     @Async
     public void executingTaskSpeciesToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
-        int delay = (int) mappingSetting.get("delayInMilisecond");
-        int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
-
         executor.execute(() -> {
             try {
+                String host = String.valueOf(mappingSetting.get("host"));
+                String tempPort = String.valueOf(mappingSetting.get("port"));
+                String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
+                LinkedHashMap api = (LinkedHashMap)  mappingSetting.get("api");
+                saveUrl = host + ":" + port + String.valueOf(api.get("save"));
+                TypeReference<TNCSpecies> typeReference = new TypeReference<TNCSpecies>() {};
+
+                List<LinkedHashMap> setting = ((List<LinkedHashMap>) mappingSetting.get("mapOfColumns"));
+                int delay = (int) mappingSetting.get("delayInMilisecond");
+                int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
+
                 while (true) {
                     i = 0;
                     logger.info("SPECIES");
                     TimeUnit.MILLISECONDS.sleep(delay);
 
-                    List<TNCSpecies> data = getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
+                    List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
                     if (data.size() == 0) {
                         if (tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name()) > 0)
                             p = 0;
-                        else
-                            continue;
                     } else {
-                        processingTask(data, mappingSetting, numberOfDataPerRequest);
+                        processingTask(data, setting);
                         p = (data.size() < numberOfDataPerRequest) ? 0 : (p + 1);
                     }
                 }
@@ -79,73 +78,30 @@ public class SpeciesSyncronizer implements PostClient {
     }
 
 
-    /**
-     *
-     * @param mappingSetting
-     * @param numberOfDataPerRequest
-     * @return
-     */
-    private synchronized void processingTask(List<TNCSpecies> tncSpecies, LinkedHashMap mappingSetting, int numberOfDataPerRequest) {
 
-        String host = String.valueOf(mappingSetting.get("host"));
-        String tempPort = String.valueOf(mappingSetting.get("port"));
-        String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
-        LinkedHashMap api = (LinkedHashMap)  mappingSetting.get("api");
-
-        TypeReference<TNCSpecies> typeReference = new TypeReference<TNCSpecies>() {};
-        final ObjectMapper mapper = new ObjectMapper();
-
-        List<LinkedHashMap> setting = (List<LinkedHashMap>) mappingSetting.get("mapOfColumns");
+    private synchronized void processingTask(List<TNCSpecies> tncSpecies, List<LinkedHashMap> setting) {
 
         tncSpecies.forEach(species -> {
             i++;
-            LinkedHashMap map = null;
-            try {
-                if (species != null)
-                    map = (LinkedHashMap) (mapper.readValue(mapper.writeValueAsBytes(species), Object.class));
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (map != null) {
-                    BRPLSpecies brplSpecies = null;
-                    LinkedHashMap o = translator.translate(setting, map);
-                    try {
-                        String s = mapper.writeValueAsString(o);
-                        brplSpecies = mapper.readValue(s, BRPLSpecies.class);
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (brplSpecies != null) {
-                            RestTemplate restTemplate = new RestTemplate();
-                            String url = host + ":" + port + String.valueOf(api.get("save"));
-                            Object response = restTemplate.postForObject(url, brplSpecies, Object.class);
-                            LinkedHashMap res = (LinkedHashMap) response;
-                            if (response != null) {
-                                String status = String.valueOf(res.get("httpStatus"));
-                                if (status.equals("OK")) {
-                                    species.setPostStatus(PostStatus.POSTED.name());
-                                    tncSpeciesService.save(species);
-                                }
-                            } else {
-
-                            }
-
-                            String c = "Untuk Page " + String.valueOf(p + 1) + " ## data Ke-" + String.valueOf(i);
-                            logger.info(c);
-
-                        } else {
-
+            if (species != null){
+                BRPLSpecies brplSpecies = translator.translateToDestinationClass(TNCSpecies.class, BRPLSpecies.class, species, setting);
+                if (brplSpecies != null) {
+                    Object response = translator.httpRequestPostForObject(saveUrl, brplSpecies, Object.class);
+                    if (response != null) {
+                        LinkedHashMap res = (LinkedHashMap) response;
+                        String status = String.valueOf(res.get("httpStatus"));
+                        if (status.equals("OK")) {
+                            species.setPostStatus(PostStatus.POSTED.name());
+                            tncSpeciesService.save(species);
                         }
                     }
+
+                    String c = "Untuk Page " + String.valueOf(p + 1) + " ## data Ke-" + String.valueOf(i);
+                    logger.info(c);
                 }
             }
 
-
         });
-
-//        return true;
     }
 
 }

@@ -17,6 +17,10 @@ public class TNCDeepslopeService {
     @Autowired
     private TNCDeepslopeRepo tncDeepslopeRepo;
 
+    public TNCDeepslope save(TNCDeepslope deepslope) {
+        return tncDeepslopeRepo.save(deepslope);
+    }
+
     public List<TNCDeepslope> getAll(Pageable pageable) {
         return tncDeepslopeRepo.findAll(pageable).getContent();
     }
