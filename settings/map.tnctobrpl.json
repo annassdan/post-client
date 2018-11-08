@@ -1,8 +1,9 @@
 [
   {
     "className": "TNCSpecies",
-    "numberOfDataPerRequest": 100,
+    "numberOfDataPerRequest": 50,
     "delayInMilisecond": 250,
+    "scheduleDelayInMinute": 1,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -176,8 +177,9 @@
   },
   {
     "className": "TNCBoat",
-    "numberOfDataPerRequest": 100,
-    "delayInMilisecond": 500,
+    "numberOfDataPerRequest": 500,
+    "delayInMilisecond": 300,
+    "scheduleDelayInMinute": 1,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -507,8 +509,9 @@
   },
   {
     "className": "TNCDeepslope",
-    "numberOfDataPerRequest": 100,
-    "delayInMilisecond": 500,
+    "numberOfDataPerRequest": 300,
+    "delayInMilisecond": 100,
+    "scheduleDelayInMinute": 5,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -680,6 +683,7 @@
     "className": "TNCSizing",
     "numberOfDataPerRequest": 100,
     "delayInMilisecond": 250,
+    "scheduleDelayInMinute": 5,
     "mapOfColumns": [
       {
         "atTncType": "Long",
