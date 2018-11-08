@@ -125,11 +125,8 @@ public class PostClientTranslator implements PostClient {
         @SuppressWarnings("unchecked")
         LinkedHashMap translatedObject = new LinkedHashMap();
 
-        setting.forEach(map -> {
+        for (LinkedHashMap map : setting) {
             String column = String.valueOf(map.get(MapSettings.AT_BRPL));
-//            if (column.equals("dataBoat")) {
-//                logger.info("aa");
-//            }
 
             String brplType = String.valueOf(map.get(MapSettings.AT_BRPL_TYPE));
             boolean relation = (brplType.equals(MapSettings.DataType.ONE_TO_MANY) || brplType.equals(MapSettings.DataType.ONE_TO_ONE) ||
@@ -156,10 +153,6 @@ public class PostClientTranslator implements PostClient {
                     data = (isNull) ? searchDefaultValue(String.valueOf(map.get(MapSettings.AT_BRPL_TYPE))) : value;
                 }
             } else { // jika tipe datanya berbeda
-
-
-
-
                 if (isNullInTnc && !relation) {
                     data = searchDefaultValue(String.valueOf(map.get(MapSettings.AT_BRPL_TYPE)));
                 } else {
@@ -170,15 +163,16 @@ public class PostClientTranslator implements PostClient {
 
                         switch (brplType) {
                             case MapSettings.DataType.MANY_TO_ONE:
+                                if (Long.parseLong(String.valueOf(value)) == 0)
+                                    break;
+
                                 LinkedHashMap c = new LinkedHashMap();
                                 c.put("uuid", String.valueOf(value));
-
                                 data = c;
                                 break;
                             case MapSettings.DataType.ONE_TO_MANY:
-//                                if (map.containsValue("classRef")) {
                                 String cNameRef = String.valueOf(map.get("classRef"));
-                                LinkedHashMap<String, Class> types = (LinkedHashMap<String, Class>) assocsType.get(cNameRef);
+                                LinkedHashMap<String, Class> types = assocsType.get(cNameRef);
                                 Class sourceClass = types.get("sourceClass");
                                 Class destinationClass = types.get("destinationClass");
                                 List assocValues = assocs.get(cNameRef); // ambil data asosiasinya
@@ -187,17 +181,14 @@ public class PostClientTranslator implements PostClient {
                                 List<LinkedHashMap> columnSetting = (List<LinkedHashMap>) settingAssoc.get("mapOfColumns");
 
                                 List translatedAssoc = new ArrayList();
-                                assocValues.forEach(o -> {
-
+                                for (Object o: assocValues) {
                                     translatedAssoc.add(
                                             translateToDestinationClass(sourceClass,
                                                     destinationClass, o,
                                                     columnSetting)
                                     );
-                                });
-
+                                }
                                 data = translatedAssoc;
-//                                }
                                 break;
                             case MapSettings.DataType.DATE:
                             case MapSettings.DataType.TIME:
@@ -222,7 +213,7 @@ public class PostClientTranslator implements PostClient {
 
 
             translatedObject.put(column, data);
-        });
+        }
 
         return translatedObject;
     }
