@@ -35,73 +35,101 @@ public class SpeciesSyncronizer implements PostClient {
     private PostClientTranslator translator;
 
     private int i = 0;
-    private int p;
     private String saveUrl;
-
-    public SpeciesSyncronizer() {
-        this.p = 0;
-    }
 
     @Async
     public void executingTaskSpeciesToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
         executor.execute(() -> {
-            try {
-                String host = String.valueOf(mappingSetting.get("host"));
-                String tempPort = String.valueOf(mappingSetting.get("port"));
-                String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
-                LinkedHashMap api = (LinkedHashMap)  mappingSetting.get("api");
-                saveUrl = host + ":" + port + String.valueOf(api.get("save"));
-                TypeReference<TNCSpecies> typeReference = new TypeReference<TNCSpecies>() {};
 
-                List<LinkedHashMap> setting = ((List<LinkedHashMap>) mappingSetting.get("mapOfColumns"));
-                int delay = (int) mappingSetting.get("delayInMilisecond");
-                int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
+            String host = String.valueOf(mappingSetting.get("host"));
+            String tempPort = String.valueOf(mappingSetting.get("port"));
+            String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
+            LinkedHashMap api = (LinkedHashMap) mappingSetting.get("api");
+            saveUrl = host + ":" + port + String.valueOf(api.get("save"));
+            TypeReference<TNCSpecies> typeReference = new TypeReference<TNCSpecies>() {
+            };
 
-                while (true) {
-                    i = 0;
-                    logger.info("SPECIES");
-                    TimeUnit.MILLISECONDS.sleep(delay);
+            List<LinkedHashMap> setting = ((List<LinkedHashMap>) mappingSetting.get("mapOfColumns"));
+            int delay = (int) mappingSetting.get("delayInMilisecond");
+            int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
 
-                    List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
-                    if (data.size() == 0) {
-                        if (tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name()) > 0)
-                            p = 0;
-                    } else {
-                        processingTask(data, setting);
-                        p = (data.size() < numberOfDataPerRequest) ? 0 : (p + 1);
+            boolean process;
+            int processDelay = (int) mappingSetting.get("scheduleDelayInMinute");
+            long processAt = 0;
+            while (true) {
+                processAt++;
+                int stopProcess = 0;
+                i = 0;
+                process = true;
+                while (process) {
+                    try {
+                        logger.info("SPECIES## untuk proses ke-" + String.valueOf(processAt));
+                        TimeUnit.MILLISECONDS.sleep(delay);
+
+                        long amountOfData = tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name());
+                        if (amountOfData > 0) {
+                            List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(PostStatus.DRAFT.name(), 0, numberOfDataPerRequest);
+                            processingTask(data, setting);
+                            process = (amountOfData <= numberOfDataPerRequest) ? false : true;
+                        } else {
+                            process = false;
+                        }
+
+//                                List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
+//                        if (data.size() == 0) {
+//                            if (tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name()) > 0)
+//                                p = 0;
+//                        } else {
+//                            processingTask(data, setting);
+//                            p = (data.size() < numberOfDataPerRequest) ? 0 : (p + 1);
+//                        }
+                    } catch (Exception ignored) {
                     }
                 }
-            } catch (Exception ignored) {
-                p = 0;
+
+                try {
+                    TimeUnit.MINUTES.sleep(processDelay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+
         });
     }
 
 
-
     private synchronized void processingTask(List<TNCSpecies> tncSpecies, List<LinkedHashMap> setting) {
 
-        tncSpecies.forEach(species -> {
-            i++;
-            if (species != null){
-                BRPLSpecies brplSpecies = translator.translateToDestinationClass(TNCSpecies.class, BRPLSpecies.class, species, setting);
-                if (brplSpecies != null) {
-                    Object response = translator.httpRequestPostForObject(saveUrl, brplSpecies, Object.class);
-                    if (response != null) {
-                        LinkedHashMap res = (LinkedHashMap) response;
-                        String status = String.valueOf(res.get("httpStatus"));
-                        if (status.equals("OK")) {
-                            species.setPostStatus(PostStatus.POSTED.name());
-                            tncSpeciesService.save(species);
+        for (TNCSpecies species : tncSpecies) {
+            try {
+                i++;
+                if (species != null) {
+                    BRPLSpecies brplSpecies = translator.translateToDestinationClass(TNCSpecies.class, BRPLSpecies.class, species, setting);
+                    if (brplSpecies != null) {
+                        try {
+                            Object response = translator.httpRequestPostForObject(saveUrl, brplSpecies, Object.class);
+                            if (response != null) {
+                                LinkedHashMap res = (LinkedHashMap) response;
+                                String status = String.valueOf(res.get("httpStatus"));
+                                if (status.equals("OK")) {
+                                    species.setPostStatus(PostStatus.POSTED.name());
+                                    tncSpeciesService.save(species);
+
+                                    String c = "Species# -- ## data Ke-" + String.valueOf(i);
+                                    logger.info(c);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            continue;
                         }
                     }
-
-                    String c = "Untuk Page " + String.valueOf(p + 1) + " ## data Ke-" + String.valueOf(i);
-                    logger.info(c);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
             }
-
-        });
+        }
     }
 
 }
