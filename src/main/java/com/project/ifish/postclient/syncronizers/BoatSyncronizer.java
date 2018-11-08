@@ -58,6 +58,8 @@ public class BoatSyncronizer implements PostClient {
             boolean process;
             int processDelay = (int) mappingSetting.get("scheduleDelayInMinute");
             long processAt = 0;
+
+            List<TNCBoat> data;
             while (true) {
                 processAt++;
                 i = 0;
@@ -69,9 +71,11 @@ public class BoatSyncronizer implements PostClient {
 
                         long amountOfData = boatService.countAllByPostStatus(PostStatus.DRAFT.name());
                         if (amountOfData > 0) {
-                            List<TNCBoat> data = boatService.getAllByPostStatus(PostStatus.DRAFT.name(), 0, numberOfDataPerRequest);
+                            data = boatService.getAllByPostStatus(PostStatus.DRAFT.name(), 0, numberOfDataPerRequest);
                             processingTask(data, setting);
-                            process = (amountOfData <= numberOfDataPerRequest) ? false : true;
+
+                            data.clear();
+                            process = amountOfData > numberOfDataPerRequest;
                         } else {
                             process = false;
                         }
@@ -93,6 +97,7 @@ public class BoatSyncronizer implements PostClient {
 
     private synchronized void processingTask(List<TNCBoat> tncboats, List<LinkedHashMap> setting) {
 
+        LinkedHashMap res = null;
         for (TNCBoat boat : tncboats) {
             try {
                 i++;
@@ -103,7 +108,9 @@ public class BoatSyncronizer implements PostClient {
                         try {
                             Object response = translator.httpRequestPostForObject(saveUrl, brplBoat, Object.class);
                             if (response != null) {
-                                LinkedHashMap res = (LinkedHashMap) response;
+                                if (res != null)
+                                    res.clear();
+                                res = (LinkedHashMap) response;
                                 String status = String.valueOf(res.get("httpStatus"));
                                 if (status.equals("OK")) {
                                     boat.setPostStatus(PostStatus.POSTED.name());
@@ -112,6 +119,7 @@ public class BoatSyncronizer implements PostClient {
                                     String c = "Boat# -- ## data Ke-" + String.valueOf(i);
                                     logger.info(c);
                                 }
+                                res.clear();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

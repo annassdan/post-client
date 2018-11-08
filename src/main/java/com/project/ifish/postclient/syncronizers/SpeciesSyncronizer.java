@@ -70,19 +70,11 @@ public class SpeciesSyncronizer implements PostClient {
                         if (amountOfData > 0) {
                             List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(PostStatus.DRAFT.name(), 0, numberOfDataPerRequest);
                             processingTask(data, setting);
-                            process = (amountOfData <= numberOfDataPerRequest) ? false : true;
+                            process = amountOfData > numberOfDataPerRequest;
                         } else {
                             process = false;
                         }
 
-//                                List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
-//                        if (data.size() == 0) {
-//                            if (tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name()) > 0)
-//                                p = 0;
-//                        } else {
-//                            processingTask(data, setting);
-//                            p = (data.size() < numberOfDataPerRequest) ? 0 : (p + 1);
-//                        }
                     } catch (Exception ignored) {
                     }
                 }

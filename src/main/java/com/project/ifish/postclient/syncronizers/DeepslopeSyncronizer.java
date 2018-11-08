@@ -36,60 +36,69 @@ public class DeepslopeSyncronizer implements PostClient {
     @Autowired
     private TaskExecutor executor;
 
-    @Autowired
     private PostClientTranslator translator;
 
     private int i = 0;
-    private int p;
     private String saveUrl = "";
-
-    public DeepslopeSyncronizer() {
-        this.p = 0;
-    }
 
     @Async
     public void executingTaskDeepslopeToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
 
-
         executor.execute(() -> {
-            try {
+            String host = String.valueOf(mappingSetting.get("host"));
+            String tempPort = String.valueOf(mappingSetting.get("port"));
+            String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
+            LinkedHashMap api = (LinkedHashMap) mappingSetting.get("api");
+            saveUrl = host + ":" + port + String.valueOf(api.get("save"));
+            TypeReference<TNCDeepslope> typeReference = new TypeReference<TNCDeepslope>() {
+            };
 
-                String host = String.valueOf(mappingSetting.get("host"));
-                String tempPort = String.valueOf(mappingSetting.get("port"));
-                String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
-                LinkedHashMap api = (LinkedHashMap) mappingSetting.get("api");
-                saveUrl = host + ":" + port + String.valueOf(api.get("save"));
-                TypeReference<TNCDeepslope> typeReference = new TypeReference<TNCDeepslope>() {};
+            List<LinkedHashMap> setting = (List<LinkedHashMap>) mappingSetting.get("mapOfColumns");
+            int delay = (int) mappingSetting.get("delayInMilisecond");
+            int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
 
-                List<LinkedHashMap> setting = (List<LinkedHashMap>) mappingSetting.get("mapOfColumns");
-                int delay = (int) mappingSetting.get("delayInMilisecond");
-                int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
+            boolean process;
+            int processDelay = (int) mappingSetting.get("scheduleDelayInMinute");
+            long processAt = 0;
+            while (true) {
+                processAt++;
+                int stopProcess = 0;
+                i = 0;
+                process = true;
+                while (process) {
+                    try {
+                        logger.info("DEEPSLOPE## untuk proses ke-" + String.valueOf(processAt));
+                        TimeUnit.MILLISECONDS.sleep(delay);
 
-                while (true) {
-                    logger.info("DEEPSLOPE");
-                    TimeUnit.MILLISECONDS.sleep(delay);
+                        long amountOfData = tncDeepslopeService.countAllByPostStatus(PostStatus.DRAFT.name());
+                        if (amountOfData > 0) {
+                            List<TNCDeepslope> data = tncDeepslopeService.getAllByPostStatus(PostStatus.DRAFT.name(), 0, numberOfDataPerRequest);
+                            processingTask(data, setting);
+                            process = amountOfData > numberOfDataPerRequest;
+                        } else {
+                            process = false;
+                        }
 
-                    List<TNCDeepslope> data = tncDeepslopeService.getAllByPostStatus(PostStatus.DRAFT.name(), p, numberOfDataPerRequest);
-                    if (data.size() == 0) {
-                        if (tncDeepslopeService.countAllByPostStatus(PostStatus.DRAFT.name()) > 0)
-                            p = 0;
-                    } else {
-                        processingTask(data, setting, numberOfDataPerRequest);
-                        p = (data.size() < numberOfDataPerRequest) ? 0 : (p + 1);
+                    } catch (Exception ignored) {
                     }
+
                 }
-            } catch (Exception ignored) {
+
+                try {
+                    TimeUnit.MINUTES.sleep(processDelay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
+
+
+
         });
     }
 
-    private List<BRPLSizing> processingSizingData(Long landingId) {
 
-        return null;
-    }
-
-
-    private synchronized void processingTask(List<TNCDeepslope> tncDeepslopes, List<LinkedHashMap> setting, int numberOfDataPerRequest) {
+    private synchronized void processingTask(List<TNCDeepslope> tncDeepslopes, List<LinkedHashMap> setting) {
 
         LinkedHashMap<String, LinkedHashMap<String, Class>> assocRelationsType = new LinkedHashMap<>();
         LinkedHashMap<String, Class> types = new LinkedHashMap<>();
@@ -97,36 +106,49 @@ public class DeepslopeSyncronizer implements PostClient {
         types.put("destinationClass", BRPLSizing.class);
         assocRelationsType.put("TNCSizing", types);
 
-        tncDeepslopes.forEach(deepslope -> {
-            i++;
-            if (deepslope != null){
-                LinkedHashMap<String, List<?>> assocRelations = new LinkedHashMap<>();
-                long sizingSize = tncSizingService.countAllByLandingIdAndPostStatus(deepslope.getOid(), PostStatus.DRAFT.name());
-                List<TNCSizing> sizingList = tncSizingService.getAllByLandingIdAndPostStatus(deepslope.getOid(), PostStatus.DRAFT.name(), 0, (int) sizingSize);
-                assocRelations.put("TNCSizing", sizingList);
+        for (TNCDeepslope deepslope : tncDeepslopes) {
+            try {
+                i++;
+                if (deepslope != null) {
+                    LinkedHashMap<String, List<?>> assocRelations = new LinkedHashMap<>();
+                    long sizingSize = tncSizingService.countAllByLandingIdAndPostStatus(deepslope.getOid(), PostStatus.DRAFT.name());
+                    List<TNCSizing> sizingList;
+                    if (sizingSize > 0) {
+                        sizingList = tncSizingService.getAllByLandingIdAndPostStatus(deepslope.getOid(), PostStatus.DRAFT.name(), 0, (int) sizingSize);
+                        assocRelations.put("TNCSizing", sizingList);
 
-                BRPLDeepslope brplDeepslope = translator.translateToDestinationClass(TNCDeepslope.class, BRPLDeepslope.class, deepslope, setting, assocRelations, assocRelationsType);
-                if (brplDeepslope != null) {
-                    Object response = translator.httpRequestPostForObject(saveUrl, brplDeepslope, Object.class);
-                    if (response != null) {
-                        LinkedHashMap res = (LinkedHashMap) response;
-                        String status = String.valueOf(res.get("httpStatus"));
-                        if (status.equals("OK")) {
-                            deepslope.setPostStatus(PostStatus.POSTED.name());
-                            tncDeepslopeService.save(deepslope);
-                            tncSizingService.saves(sizingList);
-//                            sizingList.forEach(sizing -> {
-//                                sizing.setPostStatus(PostStatus.POSTED.name());
-//                                tncSizingService.sa
-//                            });
+                        BRPLDeepslope brplDeepslope = translator.translateToDestinationClass(TNCDeepslope.class, BRPLDeepslope.class, deepslope, setting, assocRelations, assocRelationsType);
+                        if (brplDeepslope != null) {
+                            try {
+                                Object response = translator.httpRequestPostForObject(saveUrl, brplDeepslope, Object.class);
+                                if (response != null) {
+                                    LinkedHashMap res = (LinkedHashMap) response;
+                                    String status = String.valueOf(res.get("httpStatus"));
+                                    if (status.equals("OK")) {
+                                        deepslope.setPostStatus(PostStatus.POSTED.name());
+                                        tncDeepslopeService.save(deepslope);
+                                        for (TNCSizing sizing : sizingList) {
+                                            sizing.setPostStatus(PostStatus.POSTED.name());
+                                            tncSizingService.save(sizing);
+                                        }
+                                        String c = "Deepslope# -- ## data Ke-" + String.valueOf(i);
+                                        logger.info(c);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                continue;
+                            }
                         }
                     }
 
-                    String c = "Untuk Page " + String.valueOf(p + 1) + " ## data Ke-" + String.valueOf(i);
-                    logger.info(c);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
             }
-        });
+
+        }
 
     }
 
