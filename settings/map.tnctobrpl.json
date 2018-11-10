@@ -2,7 +2,7 @@
   {
     "className": "TNCSpecies",
     "numberOfDataPerRequest": 50,
-    "delayInMilisecond": 250,
+    "delayInMilisecond": 200,
     "scheduleDelayInMinute": 1,
     "mapOfColumns": [
       {
@@ -177,8 +177,8 @@
   },
   {
     "className": "TNCBoat",
-    "numberOfDataPerRequest": 500,
-    "delayInMilisecond": 300,
+    "numberOfDataPerRequest": 1000,
+    "delayInMilisecond": 250,
     "scheduleDelayInMinute": 1,
     "mapOfColumns": [
       {
@@ -511,7 +511,7 @@
     "className": "TNCDeepslope",
     "numberOfDataPerRequest": 300,
     "delayInMilisecond": 100,
-    "scheduleDelayInMinute": 5,
+    "scheduleDelayInMinute": 1,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -746,6 +746,18 @@
     "api": {
       "save": "/api/integrasi/sizing/",
       "update": "/api/integrasi/sizing/"
+    }
+  },
+  {
+    "className": "ReqToken",
+    "settings": {
+      "host": "http://localhost",
+      "port": "4002",
+      "ifishUsername": "ifish",
+      "ifishPassword": "shefvaas",
+      "authReqTokenPath": "/oauth/token",
+      "trustedClient": "fayaqun",
+      "secretId": "satria"
     }
   }
 ]
