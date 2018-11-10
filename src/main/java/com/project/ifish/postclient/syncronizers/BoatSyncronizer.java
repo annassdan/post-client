@@ -65,12 +65,11 @@ public class BoatSyncronizer implements PostClient {
 
             boolean process;
             int processDelay = (int) mappingSetting.get("scheduleDelayInMinute");
-            long processAt = 0;
 
             List<TNCBoat> data;
             while (true) {
-                processAt++;
-                logger.info("BOAT## untuk proses ke-" + String.valueOf(processAt));
+                i = 0;
+                logger.info("BOAT## scheduled process...");
                 process = true;
                 while (process) {
                     try {
@@ -96,7 +95,7 @@ public class BoatSyncronizer implements PostClient {
                 try {
                     TimeUnit.MINUTES.sleep(processDelay);
                 } catch (InterruptedException e) {
-//                    e.printStackTrace();
+                    e.printStackTrace();
                 }
             }
 
@@ -123,24 +122,12 @@ public class BoatSyncronizer implements PostClient {
                                 if (e.getRawStatusCode() == 401) { // unauthorized
                                     if (PostclientApplication.isTokenNotExpired) {
                                         PostclientApplication.isTokenNotExpired = false;
-                                        logger.info("Unauthorized from boat...");
+                                        logger.info("Unauthorized from Boat...");
                                         TimeUnit.SECONDS.sleep(2);
                                         token = PostclientApplication.requestToken(PostclientApplication.appConfig);
                                         logger.info("Got New Token from Boat....");
                                         TimeUnit.SECONDS.sleep(2);
                                     }
-//                                    else {
-//                                        logger.info("Boat** Waiting for authorized....");
-//                                    }
-//
-//
-//                                    while (!PostclientApplication.isTokenNotExpired) {
-//                                        logger.info("Boat is waiting..");
-//                                        Thread.sleep(100);
-//                                    }
-//                                    logger.info("Strarting Boat..");
-//                                    TimeUnit.SECONDS.sleep(1);
-
 
                                     response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
                                             brplBoat, Object.class);
@@ -162,13 +149,13 @@ public class BoatSyncronizer implements PostClient {
                                 res.clear();
                             }
                         } catch (Exception e) {
-//                            e.printStackTrace();
+                            e.printStackTrace();
                             continue;
                         }
                     }
                 }
             } catch (Exception e) {
-//                e.printStackTrace();
+                e.printStackTrace();
                 continue;
             }
 

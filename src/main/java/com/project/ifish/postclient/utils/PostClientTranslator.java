@@ -33,6 +33,7 @@ public class PostClientTranslator implements PostClient {
         try {
             return ((LinkedHashMap) (mapper.readValue(mapper.writeValueAsBytes(data), Object.class)));
         } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -44,6 +45,7 @@ public class PostClientTranslator implements PostClient {
             String s = mapper.writeValueAsString(translatedObject);
             return mapper.readValue(s, className);
         } catch (IOException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -53,6 +55,7 @@ public class PostClientTranslator implements PostClient {
             SimpleDateFormat formatter = new SimpleDateFormat(patternTarget);
             return formatter.format(date);
         } catch (Exception e) {
+            e.printStackTrace();
             return "";
         }
     }
@@ -87,6 +90,7 @@ public class PostClientTranslator implements PostClient {
             else if (type.equals(MapSettings.DataType.LONG))
                 return Long.parseLong(String.valueOf(v));
         } catch (Exception e) {
+            e.printStackTrace();
             return 0;
         }
 
@@ -146,7 +150,7 @@ public class PostClientTranslator implements PostClient {
                                 new SimpleDateFormat(DATE_TIME_PATTERN_MINIMAL).parse(String.valueOf(value))
                                 , DATE_TIME_PATTERN_MINIMAL) : "";
                     } catch (Exception e) {
-//                        e.printStackTrace();
+                        e.printStackTrace();
                     }
                 } else {
                     data = (isNull) ? searchDefaultValue(String.valueOf(map.get(MapSettings.AT_BRPL_TYPE))) : value;
@@ -247,7 +251,7 @@ public class PostClientTranslator implements PostClient {
             if (o == null) return null;
             return castToObject(o, destinationClassName);
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             return null;
         }
     }

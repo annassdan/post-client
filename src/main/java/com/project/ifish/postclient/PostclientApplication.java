@@ -94,24 +94,16 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
     private void initProcess() {
 
         starter.execute(() -> {
-
-
-
             try {
-//                TimeUnit.MINUTES.sleep(1);
+                TimeUnit.MINUTES.sleep(1);
 
                 settings = initMapColumns();
-
-                requestToken(settings);
+                requestToken(settings); // request first token
                 appConfig = settings;
-
-
-
                 mainProcess.execute(() -> {
-
                     try {
                         /// waiting for master data has sincronized
-                        logger.info("**Waiting for syncronized of master data...");
+                        logger.info("** Waiting for syncronized of master data...");
                         TimeUnit.SECONDS.sleep(1);
                         boolean wait = true;
                         while (wait) {
@@ -161,7 +153,7 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
 
     @Override
     public void run(String... args) throws Exception {
-        logger.info("**Initializing.......");
+        logger.info("*** Initializing all syncronizer.......");
         initProcess();
     }
 

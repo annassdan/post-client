@@ -65,8 +65,8 @@ public class SpeciesSyncronizer implements PostClient {
             int processDelay = (int) mappingSetting.get("scheduleDelayInMinute");
             long processAt = 0;
             while (true) {
-                processAt++;
-                logger.info("SPECIES## untuk proses ke-" + String.valueOf(processAt));
+                i = 0;
+                logger.info("SPECIES## scheduled process...");
                 process = true;
                 while (process) {
                     try {
@@ -90,7 +90,7 @@ public class SpeciesSyncronizer implements PostClient {
                 try {
                     TimeUnit.MINUTES.sleep(processDelay);
                 } catch (InterruptedException e) {
-//                    e.printStackTrace();
+                    e.printStackTrace();
                 }
             }
 
@@ -149,13 +149,13 @@ public class SpeciesSyncronizer implements PostClient {
                                 }
                             }
                         } catch (Exception e) {
-//                            e.printStackTrace();
+                            e.printStackTrace();
                             continue;
                         }
                     }
                 }
             } catch (Exception e) {
-//                e.printStackTrace();
+                e.printStackTrace();
                 continue;
             }
         }

@@ -38,12 +38,11 @@ public class DeepslopeSyncronizer implements PostClient {
     @Autowired
     private TaskExecutor executor;
 
+    @Autowired
     private PostClientTranslator translator;
 
     private int i = 0;
     private String saveUrl = "";
-
-    public static boolean isFirstSyncronIsDone = false;
 
     private String token = "";
 
@@ -67,10 +66,9 @@ public class DeepslopeSyncronizer implements PostClient {
 
             boolean process;
             int processDelay = (int) mappingSetting.get("scheduleDelayInMinute");
-            long processAt = 0;
             while (true) {
-                processAt++;
-                logger.info("DEEPSLOPE## untuk proses ke-" + String.valueOf(processAt));
+                i = 0;
+                logger.info("DEEPSLOPE## scheduled process..." );
                 process = true;
                 while (process) {
                     try {
@@ -82,8 +80,6 @@ public class DeepslopeSyncronizer implements PostClient {
                             processingTask(data, setting);
                             process = amountOfData > numberOfDataPerRequest;
                         } else {
-                            if (!isFirstSyncronIsDone)
-                                isFirstSyncronIsDone = true;
                             process = false;
                         }
 
@@ -136,24 +132,12 @@ public class DeepslopeSyncronizer implements PostClient {
                                     if (e.getRawStatusCode() == 401) { // unauthorized
                                         if (PostclientApplication.isTokenNotExpired) {
                                             PostclientApplication.isTokenNotExpired = false;
-                                            logger.info("Unauthorized");
+                                            logger.info("Unauthorized in Deepslope");
                                             TimeUnit.SECONDS.sleep(2);
                                             token = PostclientApplication.requestToken(PostclientApplication.appConfig);
                                             logger.info("Got New Token....");
                                             TimeUnit.SECONDS.sleep(2);
                                         }
-
-//                                        else {
-//                                            logger.info("Deepslope** Waiting for authorized....");
-//                                        }
-//
-//                                        while (!PostclientApplication.isTokenNotExpired) {
-//                                            logger.info("Deepslope is waiting..");
-//                                            Thread.sleep(100);
-//                                        }
-//
-//                                        logger.info("Strarting Deepslope..");
-//                                        TimeUnit.SECONDS.sleep(1);
 
                                         response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
                                                 brplDeepslope, Object.class);
@@ -175,7 +159,6 @@ public class DeepslopeSyncronizer implements PostClient {
                                     }
                                 }
                             } catch (Exception e) {
-//                                e.printStackTrace();
                                 continue;
                             }
                         }
@@ -183,7 +166,6 @@ public class DeepslopeSyncronizer implements PostClient {
 
                 }
             } catch (Exception e) {
-//                e.printStackTrace();
                 continue;
             }
 
