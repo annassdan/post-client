@@ -19,8 +19,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @SuppressWarnings("unused")
@@ -41,8 +39,14 @@ public class SpeciesSyncronizer implements PostClient {
     private int i = 0;
     private String saveUrl;
 
+    public static long isFirstSyncronIsDone = 0;
+
+    private String token = "";
+
     @Async
     public void executingTaskSpeciesToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
+        token = PostclientApplication.validToken;
+
         executor.execute(() -> {
 
             String host = String.valueOf(mappingSetting.get("host"));
@@ -62,15 +66,15 @@ public class SpeciesSyncronizer implements PostClient {
             long processAt = 0;
             while (true) {
                 processAt++;
-                int stopProcess = 0;
-                i = 0;
+                logger.info("SPECIES## untuk proses ke-" + String.valueOf(processAt));
                 process = true;
                 while (process) {
                     try {
-                        logger.info("SPECIES## untuk proses ke-" + String.valueOf(processAt));
+
                         TimeUnit.MILLISECONDS.sleep(delay);
 
                         long amountOfData = tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name());
+                        isFirstSyncronIsDone = amountOfData;
                         if (amountOfData > 0) {
                             List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(PostStatus.DRAFT.name(), 0, numberOfDataPerRequest);
                             processingTask(data, setting);
@@ -86,7 +90,7 @@ public class SpeciesSyncronizer implements PostClient {
                 try {
                     TimeUnit.MINUTES.sleep(processDelay);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
             }
 
@@ -105,31 +109,31 @@ public class SpeciesSyncronizer implements PostClient {
                         try {
                             Object response = null;
                             try {
-                                response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + PostclientApplication.validToken,
+                                response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
                                         brplSpecies, Object.class);
                             } catch (HttpClientErrorException e) {
                                 if (e.getRawStatusCode() == 401) { // unauthorized
                                     if (PostclientApplication.isTokenNotExpired) {
                                         PostclientApplication.isTokenNotExpired = false;
                                         logger.info("Unauthorized From Species.....");
-                                        TimeUnit.SECONDS.sleep(3);
-                                        PostclientApplication.requestToken(PostclientApplication.appConfig);
+                                        TimeUnit.SECONDS.sleep(2);
+                                        token = PostclientApplication.requestToken(PostclientApplication.appConfig);
                                         logger.info("Got New Token from Species....");
-                                        TimeUnit.SECONDS.sleep(3);
+                                        TimeUnit.SECONDS.sleep(2);
                                     }
-                                    else {
-                                        logger.info("SPECIES** Waiting for authorized....");
-                                    }
+//                                    else {
+//                                        logger.info("SPECIES** Waiting for authorized....");
+//                                    }
+//
+//                                    while (!PostclientApplication.isTokenNotExpired) {
+//                                        logger.info("Species is waiting..");
+//                                        Thread.sleep(100);
+//                                    }
+//
+//                                    logger.info("Strarting Species..");
+//                                    TimeUnit.SECONDS.sleep(1);
 
-                                    while (!PostclientApplication.isTokenNotExpired) {
-                                        logger.info("Species is waiting..");
-                                        Thread.sleep(100);
-                                    }
-
-                                    logger.info("Strarting Species..");
-                                    TimeUnit.SECONDS.sleep(1);
-
-                                    response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + PostclientApplication.validToken,
+                                    response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
                                             brplSpecies, Object.class);
                                 }
                             }
@@ -145,13 +149,13 @@ public class SpeciesSyncronizer implements PostClient {
                                 }
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+//                            e.printStackTrace();
                             continue;
                         }
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 continue;
             }
         }

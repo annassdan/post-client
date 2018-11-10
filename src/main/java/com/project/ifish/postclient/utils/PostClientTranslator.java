@@ -146,7 +146,7 @@ public class PostClientTranslator implements PostClient {
                                 new SimpleDateFormat(DATE_TIME_PATTERN_MINIMAL).parse(String.valueOf(value))
                                 , DATE_TIME_PATTERN_MINIMAL) : "";
                     } catch (Exception e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
                     }
                 } else {
                     data = (isNull) ? searchDefaultValue(String.valueOf(map.get(MapSettings.AT_BRPL_TYPE))) : value;
@@ -247,7 +247,7 @@ public class PostClientTranslator implements PostClient {
             if (o == null) return null;
             return castToObject(o, destinationClassName);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return null;
         }
     }

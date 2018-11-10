@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,8 +27,10 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
+@SuppressWarnings("unused")
 public class PostclientApplication implements CommandLineRunner, PostClient {
 
 
@@ -45,8 +49,13 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
     private DeepslopeSyncronizer deepslopeSyncronizer;
 
     @Autowired
-    @SuppressWarnings("unused")
     private BoatSyncronizer boatSyncronizer;
+
+    @Autowired
+    private TaskExecutor starter;
+
+    @Autowired
+    private TaskExecutor mainProcess;
 
     /**
      * inisialisasi time format selalu mengikut pada waktu daerah yang dimaksud
@@ -80,40 +89,83 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
         return null;
     }
 
+    List<LinkedHashMap> settings = null;
+    @Async
+    private void initProcess() {
 
-    @Override
-    public void run(String... args) throws Exception {
-
-        List<LinkedHashMap> settings = initMapColumns();
-        requestToken(settings);
-        appConfig = settings;
-
-        LinkedHashMap speciesSetting = getSyncronizingSetting(settings, TNC_SPECIES_CLASS_NAME);
-        if (speciesSetting == null) throw new AssertionError();
-        speciesSyncronizer.executingTaskSpeciesToEBrpl(speciesSetting);
-//
-//
-        LinkedHashMap boatSetting = getSyncronizingSetting(settings, TNC_BOAT_CLASS_NAME);
-        if (boatSetting == null) throw new AssertionError();
-        boatSyncronizer.executingTaskBoatToEBrpl(boatSetting);
-//
-//
-//        LinkedHashMap deepslopeSetting = getSyncronizingSetting(settings, TNC_DEEPSLOPE_CLASS_NAME);
-//        if (deepslopeSetting == null) throw new AssertionError();
-//        deepslopeSyncronizer.executingTaskDeepslopeToEBrpl(deepslopeSetting);
+        starter.execute(() -> {
 
 
-//        String token = "43186f50-2c4d-42d7-b85a-a29de6d1c455";
-//        RestTemplate template = new RestTemplate();
-//
-//        ResponseEntity<Object> o = template.getForEntity("http://localhost:4002/api/integrasi/boat/?page=0&size=3&access_token=" + token, Object.class);
-//
-//        logger.info(o.toString());
 
+            try {
+//                TimeUnit.MINUTES.sleep(1);
+
+                settings = initMapColumns();
+
+                requestToken(settings);
+                appConfig = settings;
+
+
+
+                mainProcess.execute(() -> {
+
+                    try {
+                        /// waiting for master data has sincronized
+                        logger.info("**Waiting for syncronized of master data...");
+                        TimeUnit.SECONDS.sleep(1);
+                        boolean wait = true;
+                        while (wait) {
+                            try {
+                                TimeUnit.SECONDS.sleep(3);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            wait = !(SpeciesSyncronizer.isFirstSyncronIsDone == 0 && BoatSyncronizer.isFirstSyncronIsDone == 0);
+                        }
+
+                        logger.info("#Deepslope #First Starting for Deepslope Syncronizer in 3 seconds ......");
+                        TimeUnit.SECONDS.sleep(3);
+                        LinkedHashMap deepslopeSetting = getSyncronizingSetting(settings, TNC_DEEPSLOPE_CLASS_NAME);
+                        if (deepslopeSetting == null) throw new AssertionError();
+                        deepslopeSyncronizer.executingTaskDeepslopeToEBrpl(deepslopeSetting);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+                });
+
+                logger.info("#Species #First Starting for Species Syncronizer in 2 seconds ......");
+                TimeUnit.SECONDS.sleep(2);
+                LinkedHashMap speciesSetting = getSyncronizingSetting(settings, TNC_SPECIES_CLASS_NAME);
+                if (speciesSetting == null) throw new AssertionError();
+                speciesSyncronizer.executingTaskSpeciesToEBrpl(speciesSetting);
+
+                logger.info("#Boat #First Starting for Boat Syncronizer in 2 seconds ......");
+                TimeUnit.SECONDS.sleep(2);
+                LinkedHashMap boatSetting = getSyncronizingSetting(settings, TNC_BOAT_CLASS_NAME);
+                if (boatSetting == null) throw new AssertionError();
+                boatSyncronizer.executingTaskBoatToEBrpl(boatSetting);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+        });
 
     }
 
-    public static synchronized void requestToken(List<LinkedHashMap> setting) {
+
+    @Override
+    public void run(String... args) throws Exception {
+        logger.info("**Initializing.......");
+        initProcess();
+    }
+
+    public static synchronized String requestToken(List<LinkedHashMap> setting) {
         LinkedHashMap map = getSyncronizingSetting(setting, BRPL_REQUEST_TOKEN_SETTING);
         LinkedHashMap reqTokenSetting = (LinkedHashMap) map.get("settings");
 
@@ -143,6 +195,7 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
         validToken = (String) o.getBody().get("access_token");
         isTokenNotExpired = true;
 
+        return (String) o.getBody().get("access_token");
     }
 
 

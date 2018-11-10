@@ -22,8 +22,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @SuppressWarnings("unused")
@@ -45,8 +43,14 @@ public class DeepslopeSyncronizer implements PostClient {
     private int i = 0;
     private String saveUrl = "";
 
+    public static boolean isFirstSyncronIsDone = false;
+
+    private String token = "";
+
     @Async
     public void executingTaskDeepslopeToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
+
+        token = PostclientApplication.validToken;
 
         executor.execute(() -> {
             String host = String.valueOf(mappingSetting.get("host"));
@@ -66,12 +70,10 @@ public class DeepslopeSyncronizer implements PostClient {
             long processAt = 0;
             while (true) {
                 processAt++;
-                int stopProcess = 0;
-                i = 0;
+                logger.info("DEEPSLOPE## untuk proses ke-" + String.valueOf(processAt));
                 process = true;
                 while (process) {
                     try {
-                        logger.info("DEEPSLOPE## untuk proses ke-" + String.valueOf(processAt));
                         TimeUnit.MILLISECONDS.sleep(delay);
 
                         long amountOfData = tncDeepslopeService.countAllByPostStatus(PostStatus.DRAFT.name());
@@ -80,6 +82,8 @@ public class DeepslopeSyncronizer implements PostClient {
                             processingTask(data, setting);
                             process = amountOfData > numberOfDataPerRequest;
                         } else {
+                            if (!isFirstSyncronIsDone)
+                                isFirstSyncronIsDone = true;
                             process = false;
                         }
 
@@ -91,7 +95,7 @@ public class DeepslopeSyncronizer implements PostClient {
                 try {
                     TimeUnit.MINUTES.sleep(processDelay);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
 
             }
@@ -126,30 +130,32 @@ public class DeepslopeSyncronizer implements PostClient {
                             try {
                                 Object response = null;
                                 try {
-                                    response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + PostclientApplication.validToken,
+                                    response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
                                             brplDeepslope, Object.class);
                                 } catch (HttpClientErrorException e) {
                                     if (e.getRawStatusCode() == 401) { // unauthorized
                                         if (PostclientApplication.isTokenNotExpired) {
                                             PostclientApplication.isTokenNotExpired = false;
                                             logger.info("Unauthorized");
-                                            TimeUnit.SECONDS.sleep(5);
-                                            PostclientApplication.requestToken(PostclientApplication.appConfig);
+                                            TimeUnit.SECONDS.sleep(2);
+                                            token = PostclientApplication.requestToken(PostclientApplication.appConfig);
                                             logger.info("Got New Token....");
-                                            TimeUnit.SECONDS.sleep(5);
-                                        } else {
-                                            logger.info("Deepslope** Waiting for authorized....");
+                                            TimeUnit.SECONDS.sleep(2);
                                         }
 
-                                        while (!PostclientApplication.isTokenNotExpired) {
-                                            logger.info("Deepslope is waiting..");
-                                            Thread.sleep(100);
-                                        }
+//                                        else {
+//                                            logger.info("Deepslope** Waiting for authorized....");
+//                                        }
+//
+//                                        while (!PostclientApplication.isTokenNotExpired) {
+//                                            logger.info("Deepslope is waiting..");
+//                                            Thread.sleep(100);
+//                                        }
+//
+//                                        logger.info("Strarting Deepslope..");
+//                                        TimeUnit.SECONDS.sleep(1);
 
-                                        logger.info("Strarting Deepslope..");
-                                        TimeUnit.SECONDS.sleep(1);
-
-                                        response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + PostclientApplication.validToken,
+                                        response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
                                                 brplDeepslope, Object.class);
                                     }
                                 }
@@ -169,7 +175,7 @@ public class DeepslopeSyncronizer implements PostClient {
                                     }
                                 }
                             } catch (Exception e) {
-                                e.printStackTrace();
+//                                e.printStackTrace();
                                 continue;
                             }
                         }
@@ -177,7 +183,7 @@ public class DeepslopeSyncronizer implements PostClient {
 
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 continue;
             }
 
