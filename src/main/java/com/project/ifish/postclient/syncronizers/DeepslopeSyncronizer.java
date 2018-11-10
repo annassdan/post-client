@@ -2,6 +2,7 @@ package com.project.ifish.postclient.syncronizers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.project.ifish.postclient.PostClient;
+import com.project.ifish.postclient.PostclientApplication;
 import com.project.ifish.postclient.models.atbrpl.BRPLDeepslope;
 import com.project.ifish.postclient.models.atbrpl.BRPLSizing;
 import com.project.ifish.postclient.models.attnc.TNCDeepslope;
@@ -16,10 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @SuppressWarnings("unused")
@@ -120,7 +124,36 @@ public class DeepslopeSyncronizer implements PostClient {
                         BRPLDeepslope brplDeepslope = translator.translateToDestinationClass(TNCDeepslope.class, BRPLDeepslope.class, deepslope, setting, assocRelations, assocRelationsType);
                         if (brplDeepslope != null) {
                             try {
-                                Object response = translator.httpRequestPostForObject(saveUrl, brplDeepslope, Object.class);
+                                Object response = null;
+                                try {
+                                    response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + PostclientApplication.validToken,
+                                            brplDeepslope, Object.class);
+                                } catch (HttpClientErrorException e) {
+                                    if (e.getRawStatusCode() == 401) { // unauthorized
+                                        if (PostclientApplication.isTokenNotExpired) {
+                                            PostclientApplication.isTokenNotExpired = false;
+                                            logger.info("Unauthorized");
+                                            TimeUnit.SECONDS.sleep(5);
+                                            PostclientApplication.requestToken(PostclientApplication.appConfig);
+                                            logger.info("Got New Token....");
+                                            TimeUnit.SECONDS.sleep(5);
+                                        } else {
+                                            logger.info("Deepslope** Waiting for authorized....");
+                                        }
+
+                                        while (!PostclientApplication.isTokenNotExpired) {
+                                            logger.info("Deepslope is waiting..");
+                                            Thread.sleep(100);
+                                        }
+
+                                        logger.info("Strarting Deepslope..");
+                                        TimeUnit.SECONDS.sleep(1);
+
+                                        response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + PostclientApplication.validToken,
+                                                brplDeepslope, Object.class);
+                                    }
+                                }
+
                                 if (response != null) {
                                     LinkedHashMap res = (LinkedHashMap) response;
                                     String status = String.valueOf(res.get("httpStatus"));

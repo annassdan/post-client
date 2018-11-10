@@ -24,12 +24,8 @@ public class PostClientTranslator implements PostClient {
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     public <T> Object httpRequestPostForObject(String url, @Nullable Object request, Class<T> responseType, Object... uriVariables) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            return restTemplate.postForObject(url, request, responseType);
-        } catch (RestClientException e) {
-            return null;
-        }
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.postForObject(url, request, responseType);
     }
 
     public <T> LinkedHashMap castToLinkedHashMap(Class<T> className, T data) {
@@ -156,8 +152,6 @@ public class PostClientTranslator implements PostClient {
                     data = (isNull) ? searchDefaultValue(String.valueOf(map.get(MapSettings.AT_BRPL_TYPE))) : value;
                 }
             } else { // jika tipe datanya berbeda
-
-
 
 
                 if (isNullInTnc && !relation) {

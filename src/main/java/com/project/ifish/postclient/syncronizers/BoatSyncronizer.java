@@ -2,6 +2,7 @@ package com.project.ifish.postclient.syncronizers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.project.ifish.postclient.PostClient;
+import com.project.ifish.postclient.PostclientApplication;
 import com.project.ifish.postclient.models.atbrpl.BRPLBoat;
 import com.project.ifish.postclient.models.attnc.TNCBoat;
 import com.project.ifish.postclient.services.TNCBoatService;
@@ -13,10 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @SuppressWarnings("unused")
@@ -98,7 +102,7 @@ public class BoatSyncronizer implements PostClient {
     private synchronized void processingTask(List<TNCBoat> tncboats, List<LinkedHashMap> setting) {
 
         LinkedHashMap res = null;
-        for (TNCBoat boat : tncboats) {
+        for (TNCBoat boat : tncboats)
             try {
                 i++;
                 if (boat != null) {
@@ -106,7 +110,37 @@ public class BoatSyncronizer implements PostClient {
 
                     if (brplBoat != null) {
                         try {
-                            Object response = translator.httpRequestPostForObject(saveUrl, brplBoat, Object.class);
+                            Object response = null;
+                            try {
+                                response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + PostclientApplication.validToken,
+                                        brplBoat, Object.class);
+                            } catch (HttpClientErrorException e) {
+                                if (e.getRawStatusCode() == 401) { // unauthorized
+                                    if (PostclientApplication.isTokenNotExpired) {
+                                        PostclientApplication.isTokenNotExpired = false;
+                                        logger.info("Unauthorized from boat...");
+                                        TimeUnit.SECONDS.sleep(3);
+                                        PostclientApplication.requestToken(PostclientApplication.appConfig);
+                                        logger.info("Got New Token from Boat....");
+                                        TimeUnit.SECONDS.sleep(3);
+                                    } else {
+                                        logger.info("Boat** Waiting for authorized....");
+                                    }
+
+
+                                    while (!PostclientApplication.isTokenNotExpired) {
+                                        logger.info("Boat is waiting..");
+                                        Thread.sleep(100);
+                                    }
+                                    logger.info("Strarting Boat..");
+                                    TimeUnit.SECONDS.sleep(1);
+
+
+                                    response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + PostclientApplication.validToken,
+                                            brplBoat, Object.class);
+                                }
+                            }
+
                             if (response != null) {
                                 if (res != null)
                                     res.clear();
@@ -131,7 +165,6 @@ public class BoatSyncronizer implements PostClient {
                 e.printStackTrace();
                 continue;
             }
-        }
 
     }
 

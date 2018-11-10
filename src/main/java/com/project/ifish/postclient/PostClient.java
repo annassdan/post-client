@@ -18,6 +18,7 @@ public interface PostClient {
     String TNC_BOAT_CLASS_NAME = "TNCBoat";
     String TNC_SPECIES_CLASS_NAME = "TNCSpecies";
     String TNC_DEEPSLOPE_CLASS_NAME = "TNCDeepslope";
+    String BRPL_REQUEST_TOKEN_SETTING = "ReqToken";
 
     interface MapSettings {
         interface DataType {
