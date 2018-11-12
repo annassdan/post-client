@@ -33,6 +33,8 @@ public class SpeciesSyncronizer implements PostClient {
     @Autowired
     private TaskExecutor executor;
 
+
+
     @Autowired
     private PostClientTranslator translator;
 
@@ -42,6 +44,12 @@ public class SpeciesSyncronizer implements PostClient {
     public static long isFirstSyncronIsDone = 0;
 
     private String token = "";
+
+    @Autowired
+    private TaskExecutor maxTimer;
+
+    Integer reachedTime = 0;
+    int maxTime = 0;
 
     @Async
     public void executingTaskSpeciesToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
@@ -59,15 +67,31 @@ public class SpeciesSyncronizer implements PostClient {
 
             List<LinkedHashMap> setting = ((List<LinkedHashMap>) mappingSetting.get("mapOfColumns"));
             int delay = (int) mappingSetting.get("delayInMilisecond");
+            int maxTime = (int) mappingSetting.get("maxTimePerScheduledProcessMinute");
             int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
 
             boolean process;
             int processDelay = (int) mappingSetting.get("scheduleDelayInMinute");
             long processAt = 0;
+
             while (true) {
                 i = 0;
                 logger.info("SPECIES## scheduled process...");
                 process = true;
+
+                reachedTime = 0;
+                maxTimer.execute(() -> {
+                    while (reachedTime <= 20) {
+                        try {
+                            reachedTime++;
+                            TimeUnit.SECONDS.sleep(1);
+                        } catch (InterruptedException e) {
+                            reachedTime = maxTime + 1;
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
                 while (process) {
                     try {
 
@@ -83,7 +107,14 @@ public class SpeciesSyncronizer implements PostClient {
                             process = false;
                         }
 
+                        if (reachedTime > maxTime) {
+                            logger.info("Maximum Timeout has reached... will be process in next time");
+                            process = true;
+                        }
+
+
                     } catch (Exception ignored) {
+                        break;
                     }
                 }
 
@@ -102,6 +133,9 @@ public class SpeciesSyncronizer implements PostClient {
 
         for (TNCSpecies species : tncSpecies) {
             try {
+                if (reachedTime > maxTime) // will be process in next time
+                    break;
+
                 i++;
                 if (species != null) {
                     BRPLSpecies brplSpecies = translator.translateToDestinationClass(TNCSpecies.class, BRPLSpecies.class, species, setting);
@@ -144,7 +178,7 @@ public class SpeciesSyncronizer implements PostClient {
                                     species.setPostStatus(PostStatus.POSTED.name());
                                     tncSpeciesService.save(species);
 
-                                    String c = "Species# -- ## data Ke-" + String.valueOf(i);
+                                    String c = "Species# -- ## percobaan ke-" + String.valueOf(i);
                                     logger.info(c);
                                 }
                             }

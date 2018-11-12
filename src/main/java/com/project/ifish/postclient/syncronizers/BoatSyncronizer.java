@@ -42,6 +42,12 @@ public class BoatSyncronizer implements PostClient {
 
     private String token = "";
 
+    @Autowired
+    private TaskExecutor maxTimer;
+
+    Integer reachedTime = 0;
+    int maxTime = 0;
+
 
     @Async
     public void executingTaskBoatToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
@@ -61,6 +67,7 @@ public class BoatSyncronizer implements PostClient {
 
             List<LinkedHashMap> setting = (List<LinkedHashMap>) mappingSetting.get("mapOfColumns");
             int delay = (int) mappingSetting.get("delayInMilisecond");
+            maxTime = (int) mappingSetting.get("maxTimePerScheduledProcessMinute");
             int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
 
             boolean process;
@@ -71,6 +78,20 @@ public class BoatSyncronizer implements PostClient {
                 i = 0;
                 logger.info("BOAT## scheduled process...");
                 process = true;
+
+                reachedTime = 0;
+                maxTimer.execute(() -> {
+                    while (reachedTime <= 20) {
+                        try {
+                            reachedTime++;
+                            TimeUnit.SECONDS.sleep(1);
+                        } catch (InterruptedException e) {
+                            reachedTime = maxTime + 1;
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
                 while (process) {
                     try {
 
@@ -88,7 +109,14 @@ public class BoatSyncronizer implements PostClient {
                             process = false;
                         }
 
+                        if (reachedTime > maxTime){
+                            logger.info("Maximum Timeout has reached... will be process in next time");
+                            process = true;
+                        }
+
+
                     } catch (Exception ignored) {
+                        break;
                     }
                 }
 
@@ -108,6 +136,9 @@ public class BoatSyncronizer implements PostClient {
         LinkedHashMap res = null;
         for (TNCBoat boat : tncboats)
             try {
+                if (reachedTime > maxTime) // will be process in next time
+                    break;
+
                 i++;
                 if (boat != null) {
                     BRPLBoat brplBoat = translator.translateToDestinationClass(TNCBoat.class, BRPLBoat.class, boat, setting);
@@ -143,7 +174,7 @@ public class BoatSyncronizer implements PostClient {
                                     boat.setPostStatus(PostStatus.POSTED.name());
                                     boatService.save(boat);
 
-                                    String c = "Boat# -- ## data Ke-" + String.valueOf(i);
+                                    String c = "Boat# -- ## percobaan ke-" + String.valueOf(i);
                                     logger.info(c);
                                 }
                                 res.clear();

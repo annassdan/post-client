@@ -46,6 +46,12 @@ public class DeepslopeSyncronizer implements PostClient {
 
     private String token = "";
 
+    @Autowired
+    private TaskExecutor maxTimer;
+
+    Integer reachedTime = 0;
+    int maxTime = 0;
+
     @Async
     public void executingTaskDeepslopeToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
 
@@ -57,11 +63,13 @@ public class DeepslopeSyncronizer implements PostClient {
             String port = (tempPort == null || tempPort.isEmpty()) ? HTTP_DEFAULT_PORT : tempPort;
             LinkedHashMap api = (LinkedHashMap) mappingSetting.get("api");
             saveUrl = host + ":" + port + String.valueOf(api.get("save"));
+
             TypeReference<TNCDeepslope> typeReference = new TypeReference<TNCDeepslope>() {
             };
 
             List<LinkedHashMap> setting = (List<LinkedHashMap>) mappingSetting.get("mapOfColumns");
             int delay = (int) mappingSetting.get("delayInMilisecond");
+            int maxTime = (int) mappingSetting.get("maxTimePerScheduledProcessMinute");
             int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
 
             boolean process;
@@ -70,6 +78,20 @@ public class DeepslopeSyncronizer implements PostClient {
                 i = 0;
                 logger.info("DEEPSLOPE## scheduled process..." );
                 process = true;
+
+                reachedTime = 0;
+                maxTimer.execute(() -> {
+                    while (reachedTime <= 20) {
+                        try {
+                            reachedTime++;
+                            TimeUnit.SECONDS.sleep(1);
+                        } catch (InterruptedException e) {
+                            reachedTime = maxTime + 1;
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
                 while (process) {
                     try {
                         TimeUnit.MILLISECONDS.sleep(delay);
@@ -83,7 +105,14 @@ public class DeepslopeSyncronizer implements PostClient {
                             process = false;
                         }
 
+                        if (reachedTime > maxTime){
+                            logger.info("Maximum Timeout has reached... will be process in next time");
+                            process = true;
+                        }
+
+
                     } catch (Exception ignored) {
+                        break;
                     }
 
                 }
@@ -91,7 +120,6 @@ public class DeepslopeSyncronizer implements PostClient {
                 try {
                     TimeUnit.MINUTES.sleep(processDelay);
                 } catch (InterruptedException e) {
-//                    e.printStackTrace();
                 }
 
             }
@@ -112,6 +140,9 @@ public class DeepslopeSyncronizer implements PostClient {
 
         for (TNCDeepslope deepslope : tncDeepslopes) {
             try {
+                if (reachedTime > maxTime) // will be process in next time
+                    break;
+
                 i++;
                 if (deepslope != null) {
                     LinkedHashMap<String, List<?>> assocRelations = new LinkedHashMap<>();
@@ -154,7 +185,7 @@ public class DeepslopeSyncronizer implements PostClient {
                                             sizing.setPostStatus(PostStatus.POSTED.name());
                                             tncSizingService.save(sizing);
                                         }
-                                        String c = "Deepslope# -- ## data Ke-" + String.valueOf(i);
+                                        String c = "Deepslope# -- ## percobaan ke-" + String.valueOf(i);
                                         logger.info(c);
                                     }
                                 }
