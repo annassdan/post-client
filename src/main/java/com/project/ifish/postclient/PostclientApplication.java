@@ -30,6 +30,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
+// test_db_brpl_ifish
 @SuppressWarnings("unused")
 public class PostclientApplication implements CommandLineRunner, PostClient {
 
@@ -95,20 +96,21 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
 
         starter.execute(() -> {
             try {
-                TimeUnit.MINUTES.sleep(1);
+                TimeUnit.SECONDS.sleep(1);
 
                 settings = initMapColumns();
                 requestToken(settings); // request first token
                 appConfig = settings;
+
                 mainProcess.execute(() -> {
                     try {
-                        /// waiting for master data has sincronized
+                        /// waiting for master data sincronized
                         logger.info("** Waiting for syncronized of master data...");
-                        TimeUnit.SECONDS.sleep(1);
+                        TimeUnit.SECONDS.sleep(60);
                         boolean wait = true;
                         while (wait) {
                             try {
-                                TimeUnit.SECONDS.sleep(3);
+                                TimeUnit.SECONDS.sleep(2);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -127,6 +129,7 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
 
                 });
 
+
                 logger.info("#Species #First Starting for Species Syncronizer in 2 seconds ......");
                 TimeUnit.SECONDS.sleep(2);
                 LinkedHashMap speciesSetting = getSyncronizingSetting(settings, TNC_SPECIES_CLASS_NAME);
@@ -138,6 +141,8 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
                 LinkedHashMap boatSetting = getSyncronizingSetting(settings, TNC_BOAT_CLASS_NAME);
                 if (boatSetting == null) throw new AssertionError();
                 boatSyncronizer.executingTaskBoatToEBrpl(boatSetting);
+
+
 
             } catch (IOException e) {
                 e.printStackTrace();
