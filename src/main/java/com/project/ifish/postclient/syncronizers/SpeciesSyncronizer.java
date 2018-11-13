@@ -67,7 +67,7 @@ public class SpeciesSyncronizer implements PostClient {
 
             List<LinkedHashMap> setting = ((List<LinkedHashMap>) mappingSetting.get("mapOfColumns"));
             int delay = (int) mappingSetting.get("delayInMilisecond");
-            int maxTime = (int) mappingSetting.get("maxTimePerScheduledProcessMinute");
+            maxTime = (int) mappingSetting.get("maxTimePerScheduledProcessMinute");
             int numberOfDataPerRequest = (int) mappingSetting.get("numberOfDataPerRequest");
 
             boolean process;
@@ -84,7 +84,7 @@ public class SpeciesSyncronizer implements PostClient {
                     while (reachedTime <= 20) {
                         try {
                             reachedTime++;
-                            TimeUnit.SECONDS.sleep(1);
+                            TimeUnit.MINUTES.sleep(1);
                         } catch (InterruptedException e) {
                             reachedTime = maxTime + 1;
                             e.printStackTrace();
@@ -96,6 +96,8 @@ public class SpeciesSyncronizer implements PostClient {
                     try {
 
                         TimeUnit.MILLISECONDS.sleep(delay);
+
+
 
                         long amountOfData = tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name());
                         isFirstSyncronIsDone = amountOfData;
@@ -155,20 +157,14 @@ public class SpeciesSyncronizer implements PostClient {
                                         logger.info("Got New Token from Species....");
                                         TimeUnit.SECONDS.sleep(2);
                                     }
-//                                    else {
-//                                        logger.info("SPECIES** Waiting for authorized....");
-//                                    }
-//
-//                                    while (!PostclientApplication.isTokenNotExpired) {
-//                                        logger.info("Species is waiting..");
-//                                        Thread.sleep(100);
-//                                    }
-//
-//                                    logger.info("Strarting Species..");
-//                                    TimeUnit.SECONDS.sleep(1);
 
-                                    response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
-                                            brplSpecies, Object.class);
+                                    try {
+                                        response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
+                                                brplSpecies, Object.class);
+                                    } catch (Exception ex) {
+                                        reachedTime = maxTime + 1;
+                                        break;
+                                    }
                                 }
                             }
                             if (response != null) {

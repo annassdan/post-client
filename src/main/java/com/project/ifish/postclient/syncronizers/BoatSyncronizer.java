@@ -84,7 +84,7 @@ public class BoatSyncronizer implements PostClient {
                     while (reachedTime <= 20) {
                         try {
                             reachedTime++;
-                            TimeUnit.SECONDS.sleep(1);
+                            TimeUnit.MINUTES.sleep(1);
                         } catch (InterruptedException e) {
                             reachedTime = maxTime + 1;
                             e.printStackTrace();
@@ -103,7 +103,6 @@ public class BoatSyncronizer implements PostClient {
                             data = boatService.getAllByPostStatus(PostStatus.DRAFT.name(), 0, numberOfDataPerRequest);
                             processingTask(data, setting);
 
-                            data.clear();
                             process = amountOfData > numberOfDataPerRequest;
                         } else {
                             process = false;
@@ -133,7 +132,6 @@ public class BoatSyncronizer implements PostClient {
 
     private synchronized void processingTask(List<TNCBoat> tncboats, List<LinkedHashMap> setting) {
 
-        LinkedHashMap res = null;
         for (TNCBoat boat : tncboats)
             try {
                 if (reachedTime > maxTime) // will be process in next time
@@ -160,15 +158,18 @@ public class BoatSyncronizer implements PostClient {
                                         TimeUnit.SECONDS.sleep(2);
                                     }
 
-                                    response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
+                                    try {
+                                        response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
                                             brplBoat, Object.class);
+                                    } catch (Exception ex) {
+                                        reachedTime = maxTime + 1;
+                                        break;
+                                    }
                                 }
                             }
 
                             if (response != null) {
-                                if (res != null)
-                                    res.clear();
-                                res = (LinkedHashMap) response;
+                                LinkedHashMap res = (LinkedHashMap) response;
                                 String status = String.valueOf(res.get("httpStatus"));
                                 if (status.equals("OK")) {
                                     boat.setPostStatus(PostStatus.POSTED.name());

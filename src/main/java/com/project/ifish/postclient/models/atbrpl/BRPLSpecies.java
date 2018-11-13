@@ -18,6 +18,7 @@ public class BRPLSpecies {
     private String terakhirDiubahPadaTanggal; // Date
     private String dibuatAtauTerakhirDiubahOleh;
 
+    private Double largestSpecimenCm;
     private boolean family;
     private String fishPhylum;
     private String fishClass;

@@ -26,7 +26,7 @@ public class BRPLBoat implements PostClient {
     private String boatCode;
     private String boatName;
     private String fishingGear;
-    private String codrsContract;
+    private Integer codrsContract;
     private String captain;
     private String captainOrigin;
     private String owner;
