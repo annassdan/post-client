@@ -318,7 +318,7 @@
       {
         "atTncType": "Integer",
         "atTnc": "codrsContract",
-        "atBrplType": "Integer  ",
+        "atBrplType": "Integer",
         "atBrpl": "codrsContract"
       },
       {
