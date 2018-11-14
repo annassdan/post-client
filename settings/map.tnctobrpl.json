@@ -1,9 +1,10 @@
 [
   {
     "className": "TNCSpecies",
-    "numberOfDataPerRequest": 50,
+    "numberOfDataPerRequest": 30,
     "delayInMilisecond": 200,
     "scheduleDelayInMinute": 1,
+    "maxTimePerScheduledProcessMinute": 60,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -28,6 +29,12 @@
         "atTnc": null,
         "atBrplType": "String",
         "atBrpl": "dibuatAtauTerakhirDiubahOleh"
+      },
+      {
+        "atTncType": "Double",
+        "atTnc": "largestSpecimenCm",
+        "atBrplType": "Double",
+        "atBrpl": "largestSpecimenCm"
       },
       {
         "atTncType": "Integer",
@@ -162,14 +169,74 @@
         "atBrpl": "plottedTradeLimitTl"
       },
       {
-        "atTncType": "Double",
-        "atTnc": "conversionFactorTl2fl",
-        "atBrplType": "Double",
-        "atBrpl": "conversionFactorTl2fl"
+        "atTncType": "String",
+        "atTnc": "marketFishesOfIndonesia",
+        "atBrplType": "String",
+        "atBrpl": "marketFishesOfIndonesia"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "otherNames",
+        "atBrplType": "String",
+        "atBrpl": "otherNames"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishCode",
+        "atBrplType": "String",
+        "atBrpl": "fishCode"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "counter",
+        "atBrplType": "Integer",
+        "atBrpl": "counter"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "prefixCode",
+        "atBrplType": "String",
+        "atBrpl": "prefixCode"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "insiteCode",
+        "atBrplType": "String",
+        "atBrpl": "insiteCode"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "defaultPictureId",
+        "atBrplType": "Long",
+        "atBrpl": "defaultPictureId"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "largestSpecimenId",
+        "atBrplType": "Long",
+        "atBrpl": "largestSpecimenId"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "largestSpecimenPicture",
+        "atBrplType": "Long",
+        "atBrpl": "largestSpecimenPicture"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "largestSpecimenCatchArea",
+        "atBrplType": "String",
+        "atBrpl": "largestSpecimenCatchArea"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "uoa",
+        "atBrplType": "String",
+        "atBrpl": "uoa"
       }
     ],
     "host": "http://localhost",
-    "port": "4002",
+    "port": "4100",
     "api": {
       "save": "/api/master/spesies/",
       "update": "/api/master/spesies/"
@@ -177,9 +244,10 @@
   },
   {
     "className": "TNCBoat",
-    "numberOfDataPerRequest": 1000,
+    "numberOfDataPerRequest": 500,
     "delayInMilisecond": 250,
     "scheduleDelayInMinute": 1,
+    "maxTimePerScheduledProcessMinute": 60,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -248,9 +316,9 @@
         "atBrpl": "fishingGear"
       },
       {
-        "atTncType": "String",
+        "atTncType": "Integer",
         "atTnc": "codrsContract",
-        "atBrplType": "String",
+        "atBrplType": "Integer  ",
         "atBrpl": "codrsContract"
       },
       {
@@ -498,10 +566,22 @@
         "atTnc": "engineHp3",
         "atBrplType": "Integer",
         "atBrpl": "engineHp3"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "category",
+        "atBrplType": "String",
+        "atBrpl": "category"
+      },
+      {
+        "atTncType": "String",
+        "atTnc": "fishingGearDescription",
+        "atBrplType": "String",
+        "atBrpl": "fishingGearDescription"
       }
     ],
     "host": "http://localhost",
-    "port": "4002",
+    "port": "4100",
     "api": {
       "save": "/api/integrasi/boat/",
       "update": "/api/integrasi/boat/"
@@ -509,9 +589,10 @@
   },
   {
     "className": "TNCDeepslope",
-    "numberOfDataPerRequest": 300,
-    "delayInMilisecond": 100,
+    "numberOfDataPerRequest": 2,
+    "delayInMilisecond": 300,
     "scheduleDelayInMinute": 1,
+    "maxTimePerScheduledProcessMinute": 60,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -542,6 +623,18 @@
         "atTnc": "approach",
         "atBrplType": "Integer",
         "atBrpl": "approach"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "userId",
+        "atBrplType": "Long",
+        "atBrpl": "userId"
+      },
+      {
+        "atTncType": "Long",
+        "atTnc": "partnerId",
+        "atBrplType": "Long",
+        "atBrpl": "partnerId"
       },
       {
         "atTncType": "Date",
@@ -673,7 +766,7 @@
       }
     ],
     "host": "http://localhost",
-    "port": "4002",
+    "port": "4100",
     "api": {
       "save": "/api/integrasi/deepslope/",
       "update": "/api/integrasi/deepslope/"
@@ -683,7 +776,8 @@
     "className": "TNCSizing",
     "numberOfDataPerRequest": 100,
     "delayInMilisecond": 250,
-    "scheduleDelayInMinute": 5,
+    "scheduleDelayInMinute": 1,
+    "maxTimePerScheduledProcessMinute": 60,
     "mapOfColumns": [
       {
         "atTncType": "Long",
@@ -717,6 +811,18 @@
         "atBrpl": "dataSpecies"
       },
       {
+        "atTncType": "Long",
+        "atTnc": "offloadingId",
+        "atBrplType": "Long",
+        "atBrpl": "offloadingId"
+      },
+      {
+        "atTncType": "Integer",
+        "atTnc": "dataQuality",
+        "atBrplType": "Integer",
+        "atBrpl": "dataQuality"
+      },
+      {
         "atTncType": "Double",
         "atTnc": "cm",
         "atBrplType": "Double",
@@ -742,7 +848,7 @@
       }
     ],
     "host": "http://localhost",
-    "port": "4002",
+    "port": "4100",
     "api": {
       "save": "/api/integrasi/sizing/",
       "update": "/api/integrasi/sizing/"
@@ -752,7 +858,7 @@
     "className": "ReqToken",
     "settings": {
       "host": "http://localhost",
-      "port": "4002",
+      "port": "4100",
       "ifishUsername": "ifish",
       "ifishPassword": "shefvaas",
       "authReqTokenPath": "/oauth/token",
