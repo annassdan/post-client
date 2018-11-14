@@ -41,7 +41,7 @@ public class SpeciesSyncronizer implements PostClient {
     private int i = 0;
     private String saveUrl;
 
-    public static long isFirstSyncronIsDone = 0;
+    public static long isFirstSyncronIsDone = -1;
 
     private String token = "";
 
@@ -81,7 +81,7 @@ public class SpeciesSyncronizer implements PostClient {
 
                 reachedTime = 0;
                 maxTimer.execute(() -> {
-                    while (reachedTime <= 20) {
+                    while (reachedTime <= maxTime) {
                         try {
                             reachedTime++;
                             TimeUnit.MINUTES.sleep(1);
@@ -92,17 +92,21 @@ public class SpeciesSyncronizer implements PostClient {
                     }
                 });
 
+                int page  = -1;
                 while (process) {
                     try {
+                        page++;
 
                         TimeUnit.MILLISECONDS.sleep(delay);
-
-
-
                         long amountOfData = tncSpeciesService.countAllByPostStatus(PostStatus.DRAFT.name());
                         isFirstSyncronIsDone = amountOfData;
                         if (amountOfData > 0) {
-                            List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(PostStatus.DRAFT.name(), 0, numberOfDataPerRequest);
+                            List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(page, numberOfDataPerRequest);
+                            if (data == null || data.size() == 0) {
+                                logger.info("Exit to next schedule");
+                                break;
+                            }
+
                             processingTask(data, setting);
                             process = amountOfData > numberOfDataPerRequest;
                         } else {
@@ -110,8 +114,8 @@ public class SpeciesSyncronizer implements PostClient {
                         }
 
                         if (reachedTime > maxTime) {
-                            logger.info("Maximum Timeout has reached... will be process in next time");
-                            process = true;
+                            logger.info("Will be process in next time");
+                            process = false;
                         }
 
 
@@ -135,6 +139,9 @@ public class SpeciesSyncronizer implements PostClient {
 
         for (TNCSpecies species : tncSpecies) {
             try {
+                if (species != null && species.getPostStatus() == PostStatus.POSTED.name())
+                    continue;
+
                 if (reachedTime > maxTime) // will be process in next time
                     break;
 

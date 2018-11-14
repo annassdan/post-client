@@ -4,18 +4,27 @@ import com.project.ifish.postclient.models.attnc.TNCSizing;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 @SuppressWarnings("unused")
 public interface TNCSizingRepo
         extends PagingAndSortingRepository<TNCSizing, Long>, JpaSpecificationExecutor<TNCSizing> {
 
-    Page<TNCSizing> findAllByLandingIdAndPostStatus(Pageable pageable, Long landingId, String postStatus);
 
-    long countByLandingIdAndPostStatus(Long landingId, String postStatus);
 
-    Page<TNCSizing> findAllByPostStatus(Pageable pageable, String postStatus);
+    @Query("SELECT data FROM TNCSizing data WHERE " +
+            "landingId = :landingId AND " +
+            "postStatus = :postStatus AND " +
+            "fishId != :fishId " +
+            "GROUP BY data.oid " +
+            "ORDER BY data.oid ASC")
+    Page<TNCSizing> getDataByLandingIdAndPostStatusAndFishIdNotZero(Pageable pageable,
+                                                                                       @Param("landingId") Long landingId,
+                                                                                       @Param("postStatus") String postStatus,
+                                                                                       @Param("fishId") Long fishId);
 
-    long countByPostStatus(String postStatus);
+    long countByLandingIdAndPostStatusAndFishIdNot(Long landingId, String postStatus, Long fishId);
 
 }

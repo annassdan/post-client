@@ -127,9 +127,9 @@ public class PostClientTranslator implements PostClient {
 
         setting.forEach(map -> {
             String column = String.valueOf(map.get(MapSettings.AT_BRPL));
-//            if (column.equals("dataBoat")) {
-//                logger.info("aa");
-//            }
+
+
+
 
             String brplType = String.valueOf(map.get(MapSettings.AT_BRPL_TYPE));
             boolean relation = (brplType.equals(MapSettings.DataType.ONE_TO_MANY) || brplType.equals(MapSettings.DataType.ONE_TO_ONE) ||
@@ -137,6 +137,7 @@ public class PostClientTranslator implements PostClient {
             boolean isNullInTnc = map.get(MapSettings.AT_TNC) == null;
 
             Object value = (isNullInTnc) ? null : object.get(map.get(MapSettings.AT_TNC));
+
             boolean isNull = value == null;
 
             Object data = null;

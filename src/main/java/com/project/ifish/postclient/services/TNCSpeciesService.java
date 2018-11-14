@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@SuppressWarnings("unused")
 public class TNCSpeciesService {
 
     @Autowired
@@ -23,36 +22,32 @@ public class TNCSpeciesService {
     }
 
 
-    public List<TNCSpecies> getAll(Pageable pageable) {
-        return tncSpeciesRepo.findAll(pageable).getContent();
-    }
+//    public List<TNCSpecies> getAll(Pageable pageable) {
+//        return tncSpeciesRepo.findAll(pageable).getContent();
+//    }
+//
+//    public List<TNCSpecies> getAll(int page, int size) {
+//        Pageable pageable = PageRequest.of(page, size);
+//        return tncSpeciesRepo.findAll(pageable).getContent();
+//    }
 
-    public List<TNCSpecies> getAll(int page, int size) {
+
+    public List<TNCSpecies> getAllByPostStatus(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return tncSpeciesRepo.findAll(pageable).getContent();
+        return tncSpeciesRepo.getDataByPostStatus(pageable).getContent();
     }
-
-
-    public List<TNCSpecies> getAllByPostStatus(Pageable pageable, String status) {
-        return tncSpeciesRepo.findAllByPostStatus(pageable, status).getContent();
-    }
-
-    public List<TNCSpecies> getAllByPostStatus(String status, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return tncSpeciesRepo.findAllByPostStatus(pageable, status).getContent();
-    }
-
-    public long countAll() {
-        return tncSpeciesRepo.count();
-    }
+//
+//    public long countAll() {
+//        return tncSpeciesRepo.count();
+//    }
 
     public long countAllByPostStatus(String status) {
         return tncSpeciesRepo.countByPostStatus(status);
     }
 
-    public TNCSpecies getOne(Long id) {
-        Optional<TNCSpecies> species = tncSpeciesRepo.findById(id);
-        return species.orElse(null);
-    }
+//    public TNCSpecies getOne(Long id) {
+//        Optional<TNCSpecies> species = tncSpeciesRepo.findById(id);
+//        return species.orElse(null);
+//    }
 
 }
