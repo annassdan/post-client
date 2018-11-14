@@ -21,6 +21,8 @@ public class BRPLDeepslope {
     private String dibuatAtauTerakhirDiubahOleh;
 
     private Integer approach;
+    private Long userId;
+    private Long partnerId;
     private String landingDate; // date
     private String landingLocation;
     private String wpp1;

@@ -77,4 +77,7 @@ public class BRPLBoat implements PostClient {
     private Integer engineHp2;
     private Integer engineHp3;
 
+    private String category;
+    private String fishingGearDescription;
+
 }

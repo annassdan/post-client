@@ -38,7 +38,7 @@ public class TNCDeepslope implements PostClient {
 
     @Column(name = "partner_id")
     @ColumnDefault("'0'")
-    private long partnerId;
+    private Long partnerId;
 
     @Temporal(TemporalType.DATE)
     @JsonSerialize(using = CustomDateSerializer.class)

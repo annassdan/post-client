@@ -22,6 +22,7 @@ public class BRPLSizing {
     private String dibuatAtauTerakhirDiubahOleh;
 
     private ObjectManyToOne dataSpecies; // BRPLSpecies
+    private Long offloadingId;
     private Integer dataQuality;
     private Double cm;
     private String codrsPictureDate; // date

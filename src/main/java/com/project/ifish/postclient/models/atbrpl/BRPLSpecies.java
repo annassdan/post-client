@@ -29,6 +29,19 @@ public class BRPLSpecies {
     private String namaUmum;
     private String namaIndonesia;
     private String namaLatin;
+
+    private String marketFishesOfIndonesia;
+    private String otherNames;
+    private String fishCode;
+    private Integer counter;
+    private String prefixCode;
+    private String insiteCode;
+    private Long defaultPictureId;
+    private Long largestSpecimenId;
+    private Long largestSpecimenPicture;
+    private String largestSpecimenCatchArea;
+    private String uoa;
+
     private Integer lmat;
     private Integer lopt;
     private Integer linf;
