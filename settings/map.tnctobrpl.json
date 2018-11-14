@@ -169,6 +169,12 @@
         "atBrpl": "plottedTradeLimitTl"
       },
       {
+        "atTncType": "Double",
+        "atTnc": "conversionFactorTl2fl",
+        "atBrplType": "Double",
+        "atBrpl": "conversionFactorTl2fl"
+      },
+      {
         "atTncType": "String",
         "atTnc": "marketFishesOfIndonesia",
         "atBrplType": "String",
