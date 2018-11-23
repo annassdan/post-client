@@ -21,14 +21,14 @@ public interface TNCDeepslopeRepo
 //                                                         @Param("postStatus") String postStatus,
 //                                                         @Param("boatId") Long boatId);
 //
-    @Query("SELECT data FROM TNCDeepslope data WHERE " +
+    @Query("SELECT data FROM TNCDeepslope data WHERE approach = 2 AND " +
             "boatId != :boatId " +
             "GROUP BY data.oid " +
             "ORDER BY data.oid ASC, data.landingDate ASC")
     Page<TNCDeepslope> getDataByPostStatusAndBoatNotZero(Pageable pageable,
                                                          @Param("boatId") Long boatId);
 
-    @Query("SELECT COUNT(data) FROM TNCDeepslope data WHERE " +
+    @Query("SELECT COUNT(data) FROM TNCDeepslope data WHERE approach = 2 AND " +
             "UPPER(postStatus) = UPPER(:postStatus) AND " +
             "boatId != :boatId ")
     long tryingCountByPostStatusAndBoatIdNot(@Param("postStatus") String postStatus,
