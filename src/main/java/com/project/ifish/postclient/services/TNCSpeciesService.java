@@ -42,7 +42,7 @@ public class TNCSpeciesService {
 //    }
 
     public long countAllByPostStatus(String status) {
-        return tncSpeciesRepo.countByPostStatus(status);
+        return tncSpeciesRepo.tryingCountByPostStatus(status);
     }
 
 //    public TNCSpecies getOne(Long id) {

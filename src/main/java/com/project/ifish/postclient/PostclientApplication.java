@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 public class PostclientApplication implements CommandLineRunner, PostClient {
 
+    public static boolean enableLogger = false;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -91,22 +92,35 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
     }
 
     List<LinkedHashMap> settings = null;
+
     @Async
     private void initProcess() {
 
         starter.execute(() -> {
             try {
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.SECONDS.sleep(30);
+                logger.info("Started...");
 
-                settings = initMapColumns();
-                requestToken(settings); // request first token
-                appConfig = settings;
+                boolean init = true;
+                while (init) {
+                    try {
+                        settings = initMapColumns();
+                        requestToken(settings); // request first token
+                        appConfig = settings;
+
+                        init = false;
+                    } catch (Exception e) {
+                        logger.info("Re-initializing and connecting to ebrpl server...");
+                    }
+                    TimeUnit.SECONDS.sleep(2);
+
+                }
 
                 mainProcess.execute(() -> {
                     try {
                         /// waiting for master data sincronized
                         logger.info("** Waiting for syncronized of master data...");
-                        TimeUnit.SECONDS.sleep(60);
+                        TimeUnit.SECONDS.sleep(10);
                         boolean wait = true;
                         while (wait) {
                             try {
@@ -143,9 +157,6 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
                 boatSyncronizer.executingTaskBoatToEBrpl(boatSetting);
 
 
-
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -158,7 +169,7 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
 
     @Override
     public void run(String... args) throws Exception {
-        logger.info("*** Initializing all syncronizer.......");
+        logger.info("*** Initializing all syncronizer in 30 seconds.......");
         initProcess();
     }
 
@@ -166,6 +177,7 @@ public class PostclientApplication implements CommandLineRunner, PostClient {
         LinkedHashMap map = getSyncronizingSetting(setting, BRPL_REQUEST_TOKEN_SETTING);
         LinkedHashMap reqTokenSetting = (LinkedHashMap) map.get("settings");
 
+        PostclientApplication.enableLogger = (boolean) reqTokenSetting.get("enableLogger");
         String host = (String) reqTokenSetting.get("host");
         String port = (String) reqTokenSetting.get("port");
         String user = (String) reqTokenSetting.get("ifishUsername");

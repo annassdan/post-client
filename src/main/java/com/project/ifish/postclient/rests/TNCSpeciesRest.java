@@ -10,21 +10,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping(value = "/species",
-        produces = "application/json")
+//
+//@RestController
+//@RequestMapping(value = "/species",
+//        produces = "application/json")
 @SuppressWarnings("unused")
 public class TNCSpeciesRest {
 
-    @Autowired
-    TNCSpeciesService tncSpeciesService;
-
-    @GetMapping(params = {"page", "size"})
-    private ResponseEntity<?> serveToGetAll(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size) {
-        return new ResponseEntity<>(tncSpeciesService.getAll(page, size), HttpStatus.OK);
-    }
+//    @Autowired
+//    TNCSpeciesService tncSpeciesService;
+//
+//    @GetMapping(params = {"page", "size"})
+//    private ResponseEntity<?> serveToGetAll(
+//            @RequestParam("page") int page,
+//            @RequestParam("size") int size) {
+//        return new ResponseEntity<>(tncSpeciesService.getAll(page, size), HttpStatus.OK);
+//    }
 
 }

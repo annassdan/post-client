@@ -11,21 +11,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping(value = "/boat",
-        produces = "application/json")
+//@RestController
+//@RequestMapping(value = "/boat",
+//        produces = "application/json")
 @SuppressWarnings("unused")
 public class TNCBoatRest {
 
-    @Autowired
-    TNCBoatService tncBoatService;
-
-    @GetMapping(params = {"page", "size"})
-    private ResponseEntity<?> serveToGetAll(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size) {
-        return new ResponseEntity<>(tncBoatService.getAll(page, size), HttpStatus.OK);
-    }
+//    @Autowired
+//    TNCBoatService tncBoatService;
+//
+//    @GetMapping(params = {"page", "size"})
+//    private ResponseEntity<?> serveToGetAll(
+//            @RequestParam("page") int page,
+//            @RequestParam("size") int size) {
+//        return new ResponseEntity<>(tncBoatService.getAll(page, size), HttpStatus.OK);
+//    }
 
 
 }

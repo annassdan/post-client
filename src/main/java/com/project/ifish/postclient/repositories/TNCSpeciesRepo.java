@@ -24,6 +24,8 @@ public interface TNCSpeciesRepo
             "ORDER BY data.oid ASC")
     Page<TNCSpecies> getDataByPostStatus(Pageable pageable);
 
-    long countByPostStatus(String postStatus);
+    @Query("SELECT COUNT(data) FROM TNCSpecies data WHERE " +
+            "UPPER(postStatus) = UPPER(:postStatus) ")
+    long tryingCountByPostStatus(@Param("postStatus") String postStatus);
 
 }

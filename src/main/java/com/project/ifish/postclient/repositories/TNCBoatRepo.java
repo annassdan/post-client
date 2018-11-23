@@ -24,6 +24,8 @@ public interface TNCBoatRepo
             "ORDER BY data.oid ASC")
     Page<TNCBoat> getDataByPostStatus(Pageable pageable);
 
-    long countByPostStatus(String postStatus);
+    @Query("SELECT COUNT(data) FROM TNCBoat data WHERE " +
+            "UPPER(postStatus) = UPPER(:postStatus) ")
+    long tryingCountByPostStatus(@Param("postStatus") String postStatus);
 
 }

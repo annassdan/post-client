@@ -16,7 +16,7 @@ public interface TNCSizingRepo
 
     @Query("SELECT data FROM TNCSizing data WHERE " +
             "landingId = :landingId AND " +
-            "postStatus = :postStatus AND " +
+            "UPPERCASE(postStatus) = UPPERCASE(:postStatus) AND " +
             "fishId != :fishId " +
             "GROUP BY data.oid " +
             "ORDER BY data.oid ASC")
@@ -25,6 +25,12 @@ public interface TNCSizingRepo
                                                                                        @Param("postStatus") String postStatus,
                                                                                        @Param("fishId") Long fishId);
 
-    long countByLandingIdAndPostStatusAndFishIdNot(Long landingId, String postStatus, Long fishId);
+    @Query("SELECT COUNT(data) FROM TNCSizing data WHERE " +
+            "landingId = :landingId AND " +
+            "UPPER(postStatus) = UPPER(:postStatus) AND " +
+            "fishId != :fishId ")
+    long tryingCountByLandingIdAndPostStatusAndFishIdNot(@Param("landingId") Long landingId,
+                                                         @Param("postStatus")  String postStatus,
+                                                         @Param("fishId") Long fishId);
 
 }

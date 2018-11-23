@@ -14,21 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
-@RequestMapping(value = "/deepslope",
-        produces = "application/json")
+//@RestController
+//@RequestMapping(value = "/deepslope",
+//        produces = "application/json")
 @SuppressWarnings("unused")
 public class TNCDeepslopeRest {
 
-    @Autowired
-    TNCDeepslopeService tncDeepslopeService;
-
-    @GetMapping(params = {"page", "size"})
-    private ResponseEntity<?> serveToGetAll(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size) {
-        return new ResponseEntity<>(tncDeepslopeService.getAll(page, size), HttpStatus.OK);
-    }
+//    @Autowired
+//    TNCDeepslopeService tncDeepslopeService;
+//
+//    @GetMapping(params = {"page", "size"})
+//    private ResponseEntity<?> serveToGetAll(
+//            @RequestParam("page") int page,
+//            @RequestParam("size") int size) {
+//        return new ResponseEntity<>(tncDeepslopeService.getAll(page, size), HttpStatus.OK);
+//    }
 
 
 

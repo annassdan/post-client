@@ -74,7 +74,7 @@ public class TNCSizingService {
     }
 
     public long countAllByLandingIdAndPostStatusAndFishIdNotZero(Long landingId, String status) {
-        return tncSizingRepo.countByLandingIdAndPostStatusAndFishIdNot(landingId, status, Long.parseLong("0"));
+        return tncSizingRepo.tryingCountByLandingIdAndPostStatusAndFishIdNot(landingId, status, Long.parseLong("0"));
     }
 
 

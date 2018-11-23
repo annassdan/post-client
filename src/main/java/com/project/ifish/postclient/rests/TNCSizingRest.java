@@ -12,21 +12,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping(value = "/sizing",
-        produces = "application/json")
+//@RestController
+//@RequestMapping(value = "/sizing",
+//        produces = "application/json")
 @SuppressWarnings("unused")
 public class TNCSizingRest {
 
-    @Autowired
-    TNCSizingService tncSizingService;
-
-    @GetMapping(params = {"page", "size"})
-    private ResponseEntity<?> serveToGetAll(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size) {
-        return new ResponseEntity<>(tncSizingService.getAll(page, size), HttpStatus.OK);
-    }
+//    @Autowired
+//    TNCSizingService tncSizingService;
+//
+//    @GetMapping(params = {"page", "size"})
+//    private ResponseEntity<?> serveToGetAll(
+//            @RequestParam("page") int page,
+//            @RequestParam("size") int size) {
+//        return new ResponseEntity<>(tncSizingService.getAll(page, size), HttpStatus.OK);
+//    }
 
 
 }

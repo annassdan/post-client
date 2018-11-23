@@ -34,7 +34,6 @@ public class SpeciesSyncronizer implements PostClient {
     private TaskExecutor executor;
 
 
-
     @Autowired
     private PostClientTranslator translator;
 
@@ -50,6 +49,9 @@ public class SpeciesSyncronizer implements PostClient {
 
     Integer reachedTime = 0;
     int maxTime = 0;
+
+    boolean intteruptedByTimeOut = false;
+    int page = -1;
 
     @Async
     public void executingTaskSpeciesToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
@@ -76,7 +78,8 @@ public class SpeciesSyncronizer implements PostClient {
 
             while (true) {
                 i = 0;
-                logger.info("SPECIES## scheduled process...");
+                if (PostclientApplication.enableLogger)
+                    logger.info("SPECIES## scheduled process...");
                 process = true;
 
                 reachedTime = 0;
@@ -92,7 +95,8 @@ public class SpeciesSyncronizer implements PostClient {
                     }
                 });
 
-                int page  = -1;
+//                int page  = -1;
+                page = (intteruptedByTimeOut) ? (page - 1) : -1;
                 while (process) {
                     try {
                         page++;
@@ -103,7 +107,9 @@ public class SpeciesSyncronizer implements PostClient {
                         if (amountOfData > 0) {
                             List<TNCSpecies> data = tncSpeciesService.getAllByPostStatus(page, numberOfDataPerRequest);
                             if (data == null || data.size() == 0) {
-                                logger.info("Exit to next schedule");
+                                intteruptedByTimeOut = false;
+                                if (PostclientApplication.enableLogger)
+                                    logger.info("Exit to next schedule");
                                 break;
                             }
 
@@ -114,14 +120,19 @@ public class SpeciesSyncronizer implements PostClient {
                         }
 
                         if (reachedTime > maxTime) {
-                            logger.info("Will be process in next time");
-                            process = false;
+                            intteruptedByTimeOut = true;
+                            if (PostclientApplication.enableLogger)
+                                logger.info("Will be process in next time");
+                            break;
+//                            process = false;
                         }
 
 
                     } catch (Exception ignored) {
+                        intteruptedByTimeOut = false;
                         break;
                     }
+                    intteruptedByTimeOut = false;
                 }
 
                 try {
@@ -158,10 +169,12 @@ public class SpeciesSyncronizer implements PostClient {
                                 if (e.getRawStatusCode() == 401) { // unauthorized
                                     if (PostclientApplication.isTokenNotExpired) {
                                         PostclientApplication.isTokenNotExpired = false;
-                                        logger.info("Unauthorized From Species.....");
+                                        if (PostclientApplication.enableLogger)
+                                            logger.info("Unauthorized From Species.....");
                                         TimeUnit.SECONDS.sleep(2);
                                         token = PostclientApplication.requestToken(PostclientApplication.appConfig);
-                                        logger.info("Got New Token from Species....");
+                                        if (PostclientApplication.enableLogger)
+                                            logger.info("Got New Token from Species....");
                                         TimeUnit.SECONDS.sleep(2);
                                     }
 
@@ -182,7 +195,8 @@ public class SpeciesSyncronizer implements PostClient {
                                     tncSpeciesService.save(species);
 
                                     String c = "Species# -- ## percobaan ke-" + String.valueOf(i);
-                                    logger.info(c);
+                                    if (PostclientApplication.enableLogger)
+                                        logger.info(c);
                                 }
                             }
                         } catch (Exception e) {

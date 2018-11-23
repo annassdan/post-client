@@ -53,7 +53,7 @@ public class TNCDeepslopeService {
 //    }
 
     public long countAllByPostStatusAndBoatIdNotZero(String status) {
-        return tncDeepslopeRepo.countByPostStatusAndBoatIdNot(status, Long.parseLong("0"));
+        return tncDeepslopeRepo.tryingCountByPostStatusAndBoatIdNot(status, Long.parseLong("0"));
     }
 
 //    public TNCDeepslope getOne(Long id) {

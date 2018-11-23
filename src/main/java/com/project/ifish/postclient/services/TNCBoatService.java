@@ -44,7 +44,7 @@ public class TNCBoatService {
 //    }
 
     public long countAllByPostStatus(String status) {
-        return tncBoatRepo.countByPostStatus(status);
+        return tncBoatRepo.tryingCountByPostStatus(status);
     }
 
     public TNCBoat getOne(Long id) {

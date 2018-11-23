@@ -52,6 +52,9 @@ public class DeepslopeSyncronizer implements PostClient {
     Integer reachedTime = 0;
     int maxTime = 0;
 
+    boolean intteruptedByTimeOut = false;
+    int page = -1;
+
     @Async
     public void executingTaskDeepslopeToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
 
@@ -76,7 +79,8 @@ public class DeepslopeSyncronizer implements PostClient {
             int processDelay = (int) mappingSetting.get("scheduleDelayInMinute");
             while (true) {
                 i = 0;
-                logger.info("DEEPSLOPE## scheduled process..." );
+                if (PostclientApplication.enableLogger)
+                    logger.info("DEEPSLOPE## scheduled process...");
                 process = true;
 
                 reachedTime = 0;
@@ -93,7 +97,8 @@ public class DeepslopeSyncronizer implements PostClient {
                 });
 
 
-                int page = -1;
+//                int page = -1;
+                page = (intteruptedByTimeOut) ? (page - 1) : -1;
                 while (process) {
                     try {
                         page++;
@@ -103,7 +108,9 @@ public class DeepslopeSyncronizer implements PostClient {
                         if (amountOfData > 0) {
                             List<TNCDeepslope> data = tncDeepslopeService.getAllByPostStatusAndBoatIdNotZero(page, numberOfDataPerRequest);
                             if (data == null || data.size() == 0) {
-                                logger.info("Exit to next schedule");
+                                intteruptedByTimeOut = false;
+                                if (PostclientApplication.enableLogger)
+                                    logger.info("Exit to next schedule");
                                 break;
                             }
                             processingTask(data, setting);
@@ -112,14 +119,19 @@ public class DeepslopeSyncronizer implements PostClient {
                             process = false;
                         }
 
-                        if (reachedTime > maxTime){  // close process when time out per schedule is reached
-                            logger.info("Will be process in next time");
-                            process = false;
+                        if (reachedTime > maxTime) {  // close process when time out per schedule is reached
+                            intteruptedByTimeOut = true;
+                            if (PostclientApplication.enableLogger)
+                                logger.info("Will be process in next time");
+                            break;
+//                            process = false;
                         }
                     } catch (Exception ignored) {
+                        intteruptedByTimeOut = false;
                         break;
                     }
 
+                    intteruptedByTimeOut = false;
                 }
 
                 try {
@@ -128,7 +140,6 @@ public class DeepslopeSyncronizer implements PostClient {
                 }
 
             }
-
 
 
         });
@@ -171,10 +182,12 @@ public class DeepslopeSyncronizer implements PostClient {
                                     if (e.getRawStatusCode() == 401) { // unauthorized
                                         if (PostclientApplication.isTokenNotExpired) {
                                             PostclientApplication.isTokenNotExpired = false;
-                                            logger.info("Unauthorized in Deepslope");
+                                            if (PostclientApplication.enableLogger)
+                                                logger.info("Unauthorized in Deepslope");
                                             TimeUnit.SECONDS.sleep(2);
                                             token = PostclientApplication.requestToken(PostclientApplication.appConfig);
-                                            logger.info("Got New Token....");
+                                            if (PostclientApplication.enableLogger)
+                                                logger.info("Got New Token....");
                                             TimeUnit.SECONDS.sleep(2);
                                         }
 
@@ -202,7 +215,8 @@ public class DeepslopeSyncronizer implements PostClient {
 //                                        tncSizingService.saves(sizingList);
 
                                         String c = "Deepslope# -- ## percobaan ke-" + String.valueOf(i);
-                                        logger.info(c);
+                                        if (PostclientApplication.enableLogger)
+                                            logger.info(c);
                                     }
                                 }
                             } catch (Exception e) {

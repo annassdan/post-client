@@ -48,6 +48,9 @@ public class BoatSyncronizer implements PostClient {
     Integer reachedTime = 0;
     int maxTime = 0;
 
+    boolean intteruptedByTimeOut = false;
+    int page = -1;
+
 
     @Async
     public void executingTaskBoatToEBrpl(LinkedHashMap mappingSetting, int... sleep) {
@@ -76,7 +79,8 @@ public class BoatSyncronizer implements PostClient {
             List<TNCBoat> data;
             while (true) {
                 i = 0;
-                logger.info("BOAT## scheduled process...");
+                if (PostclientApplication.enableLogger)
+                    logger.info("BOAT## scheduled process...");
                 process = true;
 
                 reachedTime = 0;
@@ -92,11 +96,11 @@ public class BoatSyncronizer implements PostClient {
                     }
                 });
 
-                int page  = -1;
+//                int page  = -1;
+                page = (intteruptedByTimeOut) ? (page - 1) : -1;
                 while (process) {
                     try {
                         page++;
-
                         TimeUnit.MILLISECONDS.sleep(delay);
 
                         long amountOfData = boatService.countAllByPostStatus(PostStatus.DRAFT.name());
@@ -104,7 +108,9 @@ public class BoatSyncronizer implements PostClient {
                         if (amountOfData > 0) {
                             data = boatService.getAllByPostStatus(page, numberOfDataPerRequest);
                             if (data == null || data.size() == 0) {
-                                logger.info("Exit to next schedule");
+                                intteruptedByTimeOut = false;
+                                if (PostclientApplication.enableLogger)
+                                    logger.info("Exit to next schedule");
                                 break;
                             }
 
@@ -114,15 +120,20 @@ public class BoatSyncronizer implements PostClient {
                             process = false;
                         }
 
-                        if (reachedTime > maxTime){
-                            logger.info("Will be process in next time");
-                            process = false;
+                        if (reachedTime > maxTime) {
+                            intteruptedByTimeOut = true;
+                            if (PostclientApplication.enableLogger)
+                                logger.info("Will be process in next time...");
+                            break;
                         }
 
 
                     } catch (Exception ignored) {
+                        intteruptedByTimeOut = false;
                         break;
                     }
+
+                    intteruptedByTimeOut = false;
                 }
 
                 try {
@@ -160,16 +171,18 @@ public class BoatSyncronizer implements PostClient {
                                 if (e.getRawStatusCode() == 401) { // unauthorized
                                     if (PostclientApplication.isTokenNotExpired) {
                                         PostclientApplication.isTokenNotExpired = false;
-                                        logger.info("Unauthorized from Boat...");
+                                        if (PostclientApplication.enableLogger)
+                                            logger.info("Unauthorized from Boat...");
                                         TimeUnit.SECONDS.sleep(2);
                                         token = PostclientApplication.requestToken(PostclientApplication.appConfig);
-                                        logger.info("Got New Token from Boat....");
+                                        if (PostclientApplication.enableLogger)
+                                            logger.info("Got New Token from Boat....");
                                         TimeUnit.SECONDS.sleep(2);
                                     }
 
                                     try {
                                         response = translator.httpRequestPostForObject(saveUrl + "?access_token=" + token,
-                                            brplBoat, Object.class);
+                                                brplBoat, Object.class);
                                     } catch (Exception ex) {
                                         reachedTime = maxTime + 1;
                                         break;
@@ -185,7 +198,8 @@ public class BoatSyncronizer implements PostClient {
                                     boatService.save(boat);
 
                                     String c = "Boat# -- ## percobaan ke-" + String.valueOf(i);
-                                    logger.info(c);
+                                    if (PostclientApplication.enableLogger)
+                                        logger.info(c);
                                 }
                                 res.clear();
                             }
