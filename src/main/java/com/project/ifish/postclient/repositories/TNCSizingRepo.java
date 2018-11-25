@@ -16,7 +16,7 @@ public interface TNCSizingRepo
 
     @Query("SELECT data FROM TNCSizing data WHERE " +
             "landingId = :landingId AND " +
-            "UPPERCASE(postStatus) = UPPERCASE(:postStatus) AND " +
+            "UPPER(postStatus) = UPPER(:postStatus) AND " +
             "fishId != :fishId " +
             "GROUP BY data.oid " +
             "ORDER BY data.oid ASC")
