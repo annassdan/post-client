@@ -150,7 +150,7 @@ public class SpeciesSyncronizer implements PostClient {
 
         for (TNCSpecies species : tncSpecies) {
             try {
-                if (species != null && species.getPostStatus() == PostStatus.POSTED.name())
+                if (species != null && species.getPostStatus().toLowerCase().equals(PostStatus.POSTED.name().toLowerCase()))
                     continue;
 
                 if (reachedTime > maxTime) // will be process in next time

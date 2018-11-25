@@ -156,7 +156,7 @@ public class DeepslopeSyncronizer implements PostClient {
 
         for (TNCDeepslope deepslope : tncDeepslopes) {
             try {
-                if (deepslope != null && deepslope.getPostStatus() == PostStatus.POSTED.name())
+                if (deepslope != null && deepslope.getPostStatus().toLowerCase().equals(PostStatus.POSTED.name().toLowerCase()))
                     continue;
 
                 if (reachedTime > maxTime) // will be process in next time

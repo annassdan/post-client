@@ -151,7 +151,7 @@ public class BoatSyncronizer implements PostClient {
 
         for (TNCBoat boat : tncboats)
             try {
-                if (boat != null && boat.getPostStatus() == PostStatus.POSTED.name())
+                if (boat != null && boat.getPostStatus().toLowerCase().equals(PostStatus.POSTED.name().toLowerCase()))
                     continue;
 
                 if (reachedTime > maxTime) // will be process in next time
